@@ -141,6 +141,15 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+// Ensure wwwroot exists for UseStaticFiles
+var wwwrootPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "products");
+if (!Directory.Exists(wwwrootPath))
+{
+    Directory.CreateDirectory(wwwrootPath);
+}
+// Serve static files from wwwroot
+app.UseStaticFiles();
+
 app.UseRouting();
 
 // Apply CORS Policy

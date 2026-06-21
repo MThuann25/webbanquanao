@@ -86,7 +86,7 @@
                         itemsHtml += `
                             <div class="flex justify-between py-1.5 text-[11px] text-gray-500">
                                 <span>${item.productName} (Size ${item.size} / Màu ${item.color}) x${item.quantity}</span>
-                                <span>${(item.unitPrice * item.quantity).toLocaleString("N0")}đ</span>
+                                <span>${(item.unitPrice * item.quantity).toLocaleString("vi-VN")}đ</span>
                             </div>
                         `;
                     });
@@ -124,7 +124,7 @@
                         </div>
                         <div class="flex justify-between py-3 text-sm font-black border-t border-gray-200">
                             <span class="text-gray-900">Tổng thanh toán</span>
-                            <span class="text-rose-500">${data.totalAmount.toLocaleString("N0")}đ</span>
+                            <span class="text-rose-500">${data.totalAmount.toLocaleString("vi-VN")}đ</span>
                         </div>
                     `;
                 } else {

@@ -238,7 +238,7 @@
                             <tr>
                                 <td class="px-6 py-4 font-bold text-gray-800">#CS${o.id}</td>
                                 <td class="px-6 py-4 text-gray-500">${o.orderDate}</td>
-                                <td class="px-6 py-4 font-bold text-gray-900">${o.totalAmount.toLocaleString("N0")}đ</td>
+                                <td class="px-6 py-4 font-bold text-gray-900">${o.totalAmount.toLocaleString("vi-VN")}đ</td>
                                 <td class="px-6 py-4 text-gray-500">${o.paymentMethod}</td>
                                 <td class="px-6 py-4">
                                     <span class="inline-flex px-2 py-0.5 rounded-full text-[10px] font-bold ${statusColor}">${o.status}</span>
@@ -284,7 +284,7 @@
                                     <p class="text-[9px] text-gray-400">Phân loại: Size ${item.size} / Màu ${item.color}</p>
                                 </div>
                                 <span class="font-bold text-gray-700">${item.quantity}x</span>
-                                <span class="font-bold text-indigo-600">${(item.unitPrice * item.quantity).toLocaleString("N0")}đ</span>
+                                <span class="font-bold text-indigo-600">${(item.unitPrice * item.quantity).toLocaleString("vi-VN")}đ</span>
                             </div>
                         `;
                     });
@@ -304,7 +304,7 @@
                         </div>
                         <div class="flex justify-between pt-3 text-sm font-black border-t border-gray-150">
                             <span class="text-gray-900">Tổng thanh toán:</span>
-                            <span class="text-rose-500">${data.totalAmount.toLocaleString("N0")}đ</span>
+                            <span class="text-rose-500">${data.totalAmount.toLocaleString("vi-VN")}đ</span>
                         </div>
                     `;
                 } else {

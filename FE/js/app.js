@@ -1,5 +1,5 @@
 // Configuration
-const API_BASE_URL = "https://localhost:7057";
+const API_BASE_URL = "";
 
 // API Fetch Helper
 async function apiFetch(endpoint, options = {}) {
@@ -533,8 +533,8 @@ function injectChatbox() {
             card.className = "bg-white rounded-xl border border-gray-100 shadow-sm p-2 w-44 flex-shrink-0 hover:border-indigo-200 transition";
             
             const priceHtml = p.discountPrice 
-                ? `<div class="flex items-center space-x-1.5"><span class="text-xs font-bold text-rose-500">${p.discountPrice.toLocaleString("N0")}đ</span><span class="text-[9px] line-through text-gray-400">${p.price.toLocaleString("N0")}đ</span></div>` 
-                : `<span class="text-xs font-bold text-gray-900">${p.price.toLocaleString("N0")}đ</span>`;
+                ? `<div class="flex items-center space-x-1.5"><span class="text-xs font-bold text-rose-500">${p.discountPrice.toLocaleString("vi-VN")}đ</span><span class="text-[9px] line-through text-gray-400">${p.price.toLocaleString("vi-VN")}đ</span></div>` 
+                : `<span class="text-xs font-bold text-gray-900">${p.price.toLocaleString("vi-VN")}đ</span>`;
             
             card.innerHTML = `
                 <img src="${p.imageUrl}" alt="${p.name}" class="w-full h-24 object-cover rounded-lg mb-2">

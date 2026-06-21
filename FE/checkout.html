@@ -174,15 +174,15 @@
         }
 
         function updateSummaryDisplay() {
-            document.getElementById("summary-subtotal").innerText = subtotal.toLocaleString("N0") + "đ";
+            document.getElementById("summary-subtotal").innerText = subtotal.toLocaleString("vi-VN") + "đ";
             
             const total = Math.max(0, subtotal - discountAmount);
-            document.getElementById("summary-total").innerText = total.toLocaleString("N0") + "đ";
+            document.getElementById("summary-total").innerText = total.toLocaleString("vi-VN") + "đ";
 
             const discRow = document.getElementById("discount-row");
             if (discountAmount > 0) {
                 discRow.style.display = "flex";
-                document.getElementById("summary-discount").innerText = "-" + discountAmount.toLocaleString("N0") + "đ";
+                document.getElementById("summary-discount").innerText = "-" + discountAmount.toLocaleString("vi-VN") + "đ";
             } else {
                 discRow.style.display = "none";
             }
@@ -217,7 +217,7 @@
                     discountAmount = Math.min(discountAmount, subtotal);
 
                     status.classList.add("text-green-600");
-                    status.innerText = `Áp dụng mã ${data.code} thành công! Giảm ${discountAmount.toLocaleString("N0")}đ`;
+                    status.innerText = `Áp dụng mã ${data.code} thành công! Giảm ${discountAmount.toLocaleString("vi-VN")}đ`;
                     status.classList.remove("hidden");
 
                     updateSummaryDisplay();

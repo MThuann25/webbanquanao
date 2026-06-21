@@ -71,7 +71,7 @@
             phoneNumber = params.get("phoneNumber") || "";
             voucherCode = params.get("voucherCode") || "";
 
-            document.getElementById("trans-amount").innerText = amount.toLocaleString("N0") + "đ";
+            document.getElementById("trans-amount").innerText = amount.toLocaleString("vi-VN") + "đ";
 
             startTimer(300); // 5 minutes timer
         });

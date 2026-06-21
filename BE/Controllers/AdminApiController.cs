@@ -8,6 +8,8 @@ using Microsoft.EntityFrameworkCore;
 using ClothingShop.Application.Services;
 using ClothingShop.Domain.Entities;
 using ClothingShop.Domain.Interfaces;
+using System.IO;
+using Microsoft.AspNetCore.Http;
 
 namespace ClothingShop.Web.Controllers
 {
@@ -209,10 +211,14 @@ namespace ClothingShop.Web.Controllers
                 var oldMain = product.ProductImages.FirstOrDefault(pi => pi.IsMain);
                 if (oldMain != null)
                 {
-                    _unitOfWork.Repository<ProductImage>().Delete(oldMain);
+                    oldMain.ImageUrl = model.MainImageUrl;
+                    _unitOfWork.Repository<ProductImage>().Update(oldMain);
                 }
-                var newMain = new ProductImage { ProductId = product.Id, ImageUrl = model.MainImageUrl, IsMain = true };
-                await _unitOfWork.Repository<ProductImage>().AddAsync(newMain);
+                else
+                {
+                    var newMain = new ProductImage { ProductId = product.Id, ImageUrl = model.MainImageUrl, IsMain = true };
+                    await _unitOfWork.Repository<ProductImage>().AddAsync(newMain);
+                }
             }
 
             _unitOfWork.Repository<Product>().Update(product);
@@ -224,8 +230,43 @@ namespace ClothingShop.Web.Controllers
         [HttpDelete("products/{id}")]
         public async Task<IActionResult> DeleteProduct(int id)
         {
-            await _productService.DeleteProductAsync(id);
-            return Ok(new { message = "Đã xóa sản phẩm thành công!" });
+            try
+            {
+                await _productService.DeleteProductAsync(id);
+                return Ok(new { message = "Đã xóa sản phẩm thành công!" });
+            }
+            catch (DbUpdateException)
+            {
+                return BadRequest(new { message = "Không thể xóa sản phẩm này vì đã phát sinh đơn hàng. Vui lòng sử dụng tính năng Sửa để Ẩn (Tắt kích hoạt) sản phẩm thay vì Xóa." });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = "Lỗi khi xóa sản phẩm: " + ex.Message });
+            }
+        }
+
+        [HttpPost("upload")]
+        public async Task<IActionResult> UploadImage(IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+                return BadRequest(new { message = "Không tìm thấy file hợp lệ." });
+
+            var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "products");
+            if (!Directory.Exists(uploadsFolder))
+            {
+                Directory.CreateDirectory(uploadsFolder);
+            }
+
+            var uniqueFileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(file.FileName);
+            var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await file.CopyToAsync(stream);
+            }
+
+            var url = $"/images/products/{uniqueFileName}";
+            return Ok(new { url = url, message = "Tải ảnh lên thành công!" });
         }
 
         // ================= CATEGORIES CRUD =================

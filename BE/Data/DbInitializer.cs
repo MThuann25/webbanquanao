@@ -46,6 +46,11 @@ namespace ClothingShop.Infrastructure.Data
                     await userManager.AddToRoleAsync(adminUser, "User");
                 }
             }
+            else
+            {
+                var token = await userManager.GeneratePasswordResetTokenAsync(adminUser);
+                await userManager.ResetPasswordAsync(adminUser, token, "Admin@123");
+            }
 
             var customerEmail = "user@clothingshop.com";
             var customerUser = await userManager.FindByEmailAsync(customerEmail);
@@ -65,6 +70,11 @@ namespace ClothingShop.Infrastructure.Data
                 {
                     await userManager.AddToRoleAsync(customerUser, "User");
                 }
+            }
+            else
+            {
+                var token = await userManager.GeneratePasswordResetTokenAsync(customerUser);
+                await userManager.ResetPasswordAsync(customerUser, token, "Admin@123");
             }
 
             // 3. Seed Brands

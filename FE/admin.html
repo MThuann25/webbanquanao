@@ -326,8 +326,12 @@
                 </div>
 
                 <div>
-                    <label class="block text-xxs font-bold text-gray-500 uppercase tracking-wider mb-2">Đường dẫn ảnh chính (URL):</label>
-                    <input type="url" id="form-product-image" placeholder="https://images.unsplash.com/..." class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
+                    <label class="block text-xxs font-bold text-gray-500 uppercase tracking-wider mb-2">Đường dẫn ảnh chính (URL) hoặc Tải ảnh từ máy lên:</label>
+                    <div class="flex items-center space-x-2">
+                        <input type="url" id="form-product-image" placeholder="https://images.unsplash.com/..." class="flex-1 px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
+                        <input type="file" id="form-product-file" accept="image/*" onchange="handleImageUpload(event)" class="hidden">
+                        <button type="button" onclick="document.getElementById('form-product-file').click()" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-xl border border-gray-200 whitespace-nowrap"><i class="fa-solid fa-upload mr-1"></i>Tải lên</button>
+                    </div>
                 </div>
 
                 <div>
@@ -430,7 +434,7 @@
                     const data = await res.json();
                     
                     // Populate stats
-                    document.getElementById("stat-revenue").innerText = data.totalRevenue.toLocaleString("N0") + "đ";
+                    document.getElementById("stat-revenue").innerText = data.totalRevenue.toLocaleString("vi-VN") + "đ";
                     document.getElementById("stat-orders").innerText = data.totalOrders;
                     document.getElementById("stat-products").innerText = data.activeProducts;
                     document.getElementById("stat-users").innerText = data.totalUsers;
@@ -447,7 +451,7 @@
                                 </div>
                                 <div class="text-right">
                                     <span class="font-bold text-gray-900 block">${p.quantitySold} cái</span>
-                                    <span class="text-[10px] text-gray-400">${p.totalRevenue.toLocaleString("N0")}đ</span>
+                                    <span class="text-[10px] text-gray-400">${p.totalRevenue.toLocaleString("vi-VN")}đ</span>
                                 </div>
                             </div>
                         `;
@@ -509,7 +513,7 @@
                                 <td class="px-6 py-4 font-bold text-gray-800">${p.name}</td>
                                 <td class="px-6 py-4 text-gray-500">${p.categoryName || "-"}</td>
                                 <td class="px-6 py-4 text-gray-500">${p.brandName || "-"}</td>
-                                <td class="px-6 py-4 font-bold">${p.price.toLocaleString("N0")}đ</td>
+                                <td class="px-6 py-4 font-bold">${p.price.toLocaleString("vi-VN")}đ</td>
                                 <td class="px-6 py-4 text-gray-500">${p.stock}</td>
                                 <td class="px-6 py-4 text-right space-x-2">
                                     <button onclick="editProduct(${p.id})" class="text-indigo-600 hover:text-indigo-800 font-semibold"><i class="fa-regular fa-pen-to-square"></i> Sửa</button>
@@ -580,6 +584,42 @@
             }
         }
 
+        async function handleImageUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const formData = new FormData();
+            formData.append("file", file);
+
+            try {
+                // Call the upload API
+                // Assuming we use standard fetch here because apiFetch might stringify body by default
+                // Let's use apiFetch but override headers to remove Content-Type so browser sets it with boundary
+                const user = getCurrentUser();
+                const token = user ? user.token : "";
+                
+                const res = await fetch("https://localhost:7053/api/AdminApi/upload", {
+                    method: "POST",
+                    headers: {
+                        "Authorization": `Bearer ${token}`
+                    },
+                    body: formData
+                });
+                
+                const data = await res.json();
+                if (res.ok) {
+                    // Prepend the backend URL base since the returned URL is relative
+                    document.getElementById("form-product-image").value = "https://localhost:7053" + data.url;
+                    showAdminAlert(data.message, "success");
+                } else {
+                    showAdminAlert(data.message || "Tải ảnh thất bại", "error");
+                }
+            } catch (e) {
+                console.error("Image upload failed:", e);
+                showAdminAlert("Đã xảy ra lỗi khi tải ảnh.", "error");
+            }
+        }
+
         async function handleProductSubmit(event) {
             event.preventDefault();
             const id = document.getElementById("form-product-id").value;
@@ -631,9 +671,12 @@
                     showAdminAlert(data.message, "success");
                     await loadProductsData();
                     await loadDashboardData();
+                } else {
+                    showAdminAlert(data.message || "Lỗi khi xóa sản phẩm.", "error");
                 }
             } catch (e) {
                 console.error("Delete product logic failed:", e);
+                showAdminAlert("Đã xảy ra lỗi hệ thống khi xóa sản phẩm.", "error");
             }
         }
 
@@ -653,7 +696,7 @@
                                 <td class="px-6 py-4 font-bold text-gray-800">#CS${o.id}</td>
                                 <td class="px-6 py-4 text-gray-500">${o.userName}</td>
                                 <td class="px-6 py-4 text-gray-500">${o.orderDate}</td>
-                                <td class="px-6 py-4 font-bold">${o.totalAmount.toLocaleString("N0")}đ</td>
+                                <td class="px-6 py-4 font-bold">${o.totalAmount.toLocaleString("vi-VN")}đ</td>
                                 <td class="px-6 py-4 font-semibold text-gray-500">${o.paymentMethod}</td>
                                 <td class="px-6 py-4">
                                     <select onchange="updateOrderStatus(${o.id}, this.value)" class="px-2 py-1 bg-white border border-gray-250 rounded-lg text-xxs font-bold text-gray-700">
@@ -725,7 +768,7 @@
                             <tr>
                                 <td class="px-6 py-4 font-bold text-indigo-600 uppercase">${v.code}</td>
                                 <td class="px-6 py-4">${v.discountPercent ? v.discountPercent + "%" : "-"}</td>
-                                <td class="px-6 py-4 font-semibold">${v.discountAmount ? v.discountAmount.toLocaleString("N0") + "đ" : "-"}</td>
+                                <td class="px-6 py-4 font-semibold">${v.discountAmount ? v.discountAmount.toLocaleString("vi-VN") + "đ" : "-"}</td>
                                 <td class="px-6 py-4 text-gray-500">${v.expiryDate}</td>
                                 <td class="px-6 py-4">
                                     <span class="inline-flex px-2 py-0.5 rounded-full text-[10px] font-bold ${v.isActive ? 'bg-green-100 text-green-700' : 'bg-rose-100 text-rose-700'}">${v.isActive ? 'Hoạt động' : 'Hết hạn'}</span>
