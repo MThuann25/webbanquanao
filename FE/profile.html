@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ClothingShop - Trang Cá Nhân</title>
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                    },
+                    colors: {
+                        indigo: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50 text-gray-900 font-sans flex flex-col min-h-screen">
+
+    <main class="flex-1 py-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+        <h1 class="text-3xl font-black text-gray-900 tracking-tight mb-8">Trang Cá Nhân Của Bạn</h1>
+        
+        <div id="alert-box" class="hidden mb-6 p-4 rounded-xl text-xs font-semibold"></div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+            <!-- Sidebar Tabs Nav -->
+            <aside class="bg-white border border-gray-150 rounded-3xl p-6 shadow-sm self-start space-y-2">
+                <button onclick="switchTab('profile-info')" id="tab-btn-profile-info" class="tab-btn w-full px-4 py-2.5 text-left text-xs font-bold rounded-xl transition bg-indigo-550 text-indigo-600 bg-indigo-50 flex items-center space-x-2">
+                    <i class="fa-regular fa-user text-sm"></i>
+                    <span>Thông tin tài khoản</span>
+                </button>
+                <button onclick="switchTab('profile-orders')" id="tab-btn-profile-orders" class="tab-btn w-full px-4 py-2.5 text-left text-xs font-bold rounded-xl transition text-gray-500 hover:bg-gray-50 flex items-center space-x-2">
+                    <i class="fa-solid fa-receipt text-sm"></i>
+                    <span>Lịch sử đặt hàng</span>
+                </button>
+            </aside>
+
+            <!-- Tabs Content -->
+            <section class="lg:col-span-3">
+                <!-- Tab: Profile Info -->
+                <div id="tab-profile-info" class="tab-content bg-white border border-gray-150 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6">
+                    <h3 class="font-bold text-xs uppercase text-gray-400 tracking-wider">Cập nhật thông tin liên hệ</h3>
+                    
+                    <form onsubmit="handleProfileUpdate(event)" class="space-y-4">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xxs font-bold text-gray-500 uppercase tracking-wider mb-2">Họ & tên:</label>
+                                <input type="text" id="prof-name" class="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-gray-50/50" required>
+                            </div>
+                            <div>
+                                <label class="block text-xxs font-bold text-gray-500 uppercase tracking-wider mb-2">Số điện thoại:</label>
+                                <input type="tel" id="prof-phone" class="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-gray-50/50">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xxs font-bold text-gray-500 uppercase tracking-wider mb-2">Địa chỉ giao hàng mặc định:</label>
+                            <input type="text" id="prof-address" class="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-gray-50/50">
+                        </div>
+                        
+                        <button type="submit" class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-750 text-white rounded-full text-xs font-bold transition shadow-lg shadow-indigo-500/10">Lưu Thay Đổi</button>
+                    </form>
+                </div>
+
+                <!-- Tab: Orders List -->
+                <div id="tab-profile-orders" class="tab-content bg-white border border-gray-150 rounded-3xl p-6 shadow-sm hidden space-y-6">
+                    <h3 class="font-bold text-xs uppercase text-gray-400 tracking-wider">Đơn hàng đã đặt</h3>
+                    
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-100 text-xs text-left">
+                            <thead class="bg-gray-50 uppercase text-[9px] font-bold text-gray-400 tracking-wider">
+                                <tr>
+                                    <th class="px-6 py-3">Mã đơn</th>
+                                    <th class="px-6 py-3">Ngày đặt</th>
+                                    <th class="px-6 py-3">Tổng cộng</th>
+                                    <th class="px-6 py-3">Phương thức</th>
+                                    <th class="px-6 py-3">Trạng thái</th>
+                                    <th class="px-6 py-3 text-right">Hành động</th>
+                                </tr>
+                            </thead>
+                            <tbody id="orders-tbody" class="divide-y divide-gray-100">
+                                <!-- Loaded dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Order Detail Modal -->
+    <div id="order-modal" class="fixed inset-0 bg-black/55 hidden z-50 items-center justify-center p-4">
+        <div class="bg-white border border-gray-200 rounded-3xl w-full max-w-lg overflow-hidden shadow-2xl p-6 space-y-6">
+            <div class="flex justify-between items-center border-b border-gray-100 pb-3">
+                <h3 class="font-black text-sm text-gray-800" id="modal-title">Chi tiết đơn hàng #CS0</h3>
+                <button onclick="closeOrderModal()" class="text-gray-400 hover:text-gray-600 transition"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            
+            <div id="modal-content" class="text-xs space-y-4 max-h-[350px] overflow-y-auto pr-1">
+                <!-- Order content details loaded dynamically -->
+            </div>
+            
+            <div class="text-right pt-2">
+                <button onclick="closeOrderModal()" class="px-6 py-2 border border-gray-200 rounded-full text-xs font-bold text-gray-600 hover:bg-gray-50 transition">Đóng</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JS scripts -->
+    <script src="js/app.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", async () => {
+            const user = getCurrentUser();
+            if (!user) {
+                window.location.href = "login.html";
+                return;
+            }
+
+            // External login check
+            const params = new URLSearchParams(window.location.search);
+            if (params.has("loginSuccess")) {
+                // Fetch full info to update user model locally
+                await checkAuthStatus();
+                // Clear query params
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+
+            // Sync guest cart if needed
+            await syncGuestCartOnLogin();
+
+            // Populate Info Tab
+            document.getElementById("prof-name").value = user.fullName || "";
+            document.getElementById("prof-phone").value = user.phoneNumber || "";
+            document.getElementById("prof-address").value = user.address || "";
+
+            await loadOrders();
+
+            // Check if hash points to orders
+            if (window.location.hash === "#orders") {
+                switchTab("profile-orders");
+            }
+        });
+
+        function switchTab(tabId) {
+            document.querySelectorAll(".tab-content").forEach(el => el.classList.add("hidden"));
+            document.getElementById(`tab-${tabId}`).classList.remove("hidden");
+
+            document.querySelectorAll(".tab-btn").forEach(el => {
+                el.classList.remove("bg-indigo-50", "text-indigo-600");
+                el.classList.add("text-gray-500", "hover:bg-gray-50");
+            });
+            document.getElementById(`tab-btn-${tabId}`).classList.remove("text-gray-500", "hover:bg-gray-50");
+            document.getElementById(`tab-btn-${tabId}`).classList.add("bg-indigo-50", "text-indigo-600");
+        }
+
+        async function handleProfileUpdate(event) {
+            event.preventDefault();
+            const fullName = document.getElementById("prof-name").value.trim();
+            const phoneNumber = document.getElementById("prof-phone").value.trim();
+            const address = document.getElementById("prof-address").value.trim();
+
+            const box = document.getElementById("alert-box");
+            box.classList.add("hidden");
+
+            try {
+                const res = await apiFetch("AuthApi/profile", {
+                    method: "POST",
+                    body: { fullName, phoneNumber, address }
+                });
+                const data = await res.json();
+                
+                box.classList.remove("hidden", "bg-rose-100", "text-rose-700", "bg-green-100", "text-green-700");
+                if (res.ok) {
+                    box.classList.add("bg-green-100", "text-green-700");
+                    box.innerText = data.message;
+                    
+                    // Update user session cache
+                    const user = getCurrentUser();
+                    user.fullName = fullName;
+                    user.phoneNumber = phoneNumber;
+                    user.address = address;
+                    localStorage.setItem("user", JSON.stringify(user));
+                } else {
+                    box.classList.add("bg-rose-100", "text-rose-700");
+                    box.innerText = data.message;
+                }
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            } catch (e) {
+                console.error("Profile update error:", e);
+            }
+        }
+
+        async function loadOrders() {
+            const tbody = document.getElementById("orders-tbody");
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="6" class="px-6 py-8 text-center text-gray-400">
+                        <i class="fa-solid fa-spinner animate-spin text-xl mr-2"></i> Đang tải đơn hàng...
+                    </td>
+                </tr>
+            `;
+
+            try {
+                const res = await apiFetch("AuthApi/orders");
+                if (res.ok) {
+                    const data = await res.json();
+                    tbody.innerHTML = "";
+                    
+                    if (data.length === 0) {
+                        tbody.innerHTML = `
+                            <tr>
+                                <td colspan="6" class="px-6 py-8 text-center text-gray-450">Bạn chưa mua sắm đơn hàng nào.</td>
+                            </tr>
+                        `;
+                        return;
+                    }
+
+                    data.forEach(o => {
+                        let statusColor = "bg-gray-100 text-gray-600";
+                        if (o.status === "Hoàn thành") statusColor = "bg-green-100 text-green-700";
+                        if (o.status === "Đang giao") statusColor = "bg-amber-100 text-amber-700";
+                        if (o.status === "Đã hủy") statusColor = "bg-rose-100 text-rose-700";
+
+                        tbody.innerHTML += `
+                            <tr>
+                                <td class="px-6 py-4 font-bold text-gray-800">#CS${o.id}</td>
+                                <td class="px-6 py-4 text-gray-500">${o.orderDate}</td>
+                                <td class="px-6 py-4 font-bold text-gray-900">${o.totalAmount.toLocaleString("N0")}đ</td>
+                                <td class="px-6 py-4 text-gray-500">${o.paymentMethod}</td>
+                                <td class="px-6 py-4">
+                                    <span class="inline-flex px-2 py-0.5 rounded-full text-[10px] font-bold ${statusColor}">${o.status}</span>
+                                </td>
+                                <td class="px-6 py-4 text-right">
+                                    <button onclick="viewOrderDetails(${o.id})" class="text-indigo-600 hover:text-indigo-800 hover:underline font-semibold">Xem chi tiết</button>
+                                </td>
+                            </tr>
+                        `;
+                    });
+                }
+            } catch (e) {
+                console.error("Error loading profile orders history list:", e);
+            }
+        }
+
+        async function viewOrderDetails(orderId) {
+            const modal = document.getElementById("order-modal");
+            const title = document.getElementById("modal-title");
+            const content = document.getElementById("modal-content");
+            
+            title.innerText = `Chi tiết đơn hàng #CS${orderId}`;
+            content.innerHTML = `
+                <div class="text-center py-6 text-gray-400">
+                    <i class="fa-solid fa-spinner animate-spin text-lg mr-2"></i> Đang lấy dữ liệu...
+                </div>
+            `;
+            modal.classList.remove("hidden");
+            modal.classList.add("flex");
+
+            try {
+                const res = await apiFetch(`AuthApi/orders/${orderId}`);
+                if (res.ok) {
+                    const data = await res.json();
+                    
+                    let itemsHtml = "";
+                    data.items.forEach(item => {
+                        itemsHtml += `
+                            <div class="flex items-center space-x-3 py-2 border-b border-gray-50">
+                                <img src="${item.imageUrl}" class="w-10 h-12 object-cover rounded border border-gray-100 flex-shrink-0">
+                                <div class="flex-grow">
+                                    <h4 class="font-bold text-xs text-gray-800 line-clamp-1">${item.productName}</h4>
+                                    <p class="text-[9px] text-gray-400">Phân loại: Size ${item.size} / Màu ${item.color}</p>
+                                </div>
+                                <span class="font-bold text-gray-700">${item.quantity}x</span>
+                                <span class="font-bold text-indigo-600">${(item.unitPrice * item.quantity).toLocaleString("N0")}đ</span>
+                            </div>
+                        `;
+                    });
+
+                    content.innerHTML = `
+                        <div class="grid grid-cols-2 gap-y-2 border-b border-gray-100 pb-3">
+                            <span class="text-gray-400">Ngày đặt hàng:</span> <span class="font-semibold text-gray-700">${data.orderDate}</span>
+                            <span class="text-gray-400">Địa chỉ giao hàng:</span> <span class="font-semibold text-gray-700 break-words">${data.shippingAddress}</span>
+                            <span class="text-gray-400">Người nhận hàng:</span> <span class="font-semibold text-gray-700">${data.receiverName || "Khách hàng"}</span>
+                            <span class="text-gray-400">Số điện thoại:</span> <span class="font-semibold text-gray-700">${data.phoneNumber || "-"}</span>
+                            <span class="text-gray-400">Phương thức:</span> <span class="font-semibold text-indigo-600">${data.paymentMethod}</span>
+                            <span class="text-gray-400">Mã giảm giá đã dùng:</span> <span class="font-semibold text-gray-700">${data.voucherCode || "Không áp dụng"}</span>
+                        </div>
+                        <div class="space-y-1">
+                            <h4 class="font-bold text-[10px] text-gray-400 uppercase tracking-wider mb-2">Đồ đã mua:</h4>
+                            ${itemsHtml}
+                        </div>
+                        <div class="flex justify-between pt-3 text-sm font-black border-t border-gray-150">
+                            <span class="text-gray-900">Tổng thanh toán:</span>
+                            <span class="text-rose-500">${data.totalAmount.toLocaleString("N0")}đ</span>
+                        </div>
+                    `;
+                } else {
+                    content.innerHTML = `<div class="text-red-500 py-6 text-center">Không thể lấy thông tin đơn hàng.</div>`;
+                }
+            } catch (e) {
+                content.innerHTML = `<div class="text-red-500 py-6 text-center">Lỗi hệ thống hoặc kết nối API.</div>`;
+            }
+        }
+
+        function closeOrderModal() {
+            const modal = document.getElementById("order-modal");
+            modal.classList.add("hidden");
+            modal.classList.remove("flex");
+        }
+    </script>
+</body>
+</html>

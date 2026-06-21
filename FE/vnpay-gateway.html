@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VNPay - Cổng Thanh Toán Mô Phỏng</title>
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 text-gray-900 font-sans flex items-center justify-center min-h-screen p-4">
+
+    <div class="bg-white rounded-3xl border border-gray-150 shadow-2xl p-6 sm:p-10 w-full max-w-md space-y-6">
+        <!-- VNPay Mock Header -->
+        <div class="text-center space-y-2">
+            <span class="text-3xl font-black tracking-wider text-blue-600">VN<span class="text-orange-500">PAY</span></span>
+            <p class="text-xs text-gray-400 font-bold uppercase tracking-widest">Cổng Thanh Toán Demo Sandbox</p>
+        </div>
+
+        <!-- Transaction Details -->
+        <div class="bg-gray-50 border border-gray-100 rounded-2xl p-5 divide-y divide-gray-200/60 text-xs space-y-3">
+            <div class="flex justify-between py-2">
+                <span class="text-gray-500">Nhà cung cấp</span>
+                <span class="font-bold text-gray-800">CLOTHINGSHOP ONLINE</span>
+            </div>
+            <div class="flex justify-between py-2">
+                <span class="text-gray-500">Số tiền giao dịch</span>
+                <span id="trans-amount" class="font-black text-rose-500 text-sm">0đ</span>
+            </div>
+            <div class="flex justify-between py-2">
+                <span class="text-gray-500">Thông tin đơn hàng</span>
+                <span class="font-semibold text-gray-800">Thanh toán đơn hàng thời trang</span>
+            </div>
+            <div class="flex justify-between py-2">
+                <span class="text-gray-500">Thời gian còn lại</span>
+                <span id="timer" class="font-bold text-indigo-600 animate-pulse">05:00</span>
+            </div>
+        </div>
+
+        <div id="alert-box" class="hidden p-4 rounded-xl text-xs font-semibold"></div>
+
+        <!-- Actions -->
+        <div class="space-y-3 pt-2">
+            <button onclick="confirmPayment('00')" class="w-full py-3.5 bg-blue-600 hover:bg-blue-700 text-white rounded-full text-xs font-bold transition shadow-lg shadow-blue-500/10 flex items-center justify-center space-x-2">
+                <i class="fa-solid fa-circle-check"></i>
+                <span>Xác Nhận Thanh Toán (Thành Công)</span>
+            </button>
+            <button onclick="confirmPayment('24')" class="w-full py-3 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-full text-xs font-bold transition">
+                Hủy Giao Dịch (Lỗi Hủy)
+            </button>
+        </div>
+    </div>
+
+    <!-- JS Helper -->
+    <script src="js/app.js"></script>
+    <script>
+        let amount = 0;
+        let address = "";
+        let receiverName = "";
+        let phoneNumber = "";
+        let voucherCode = "";
+
+        document.addEventListener("DOMContentLoaded", () => {
+            // Read query parameters
+            const params = new URLSearchParams(window.location.search);
+            amount = parseFloat(params.get("amount") || "0");
+            address = params.get("address") || "";
+            receiverName = params.get("receiverName") || "";
+            phoneNumber = params.get("phoneNumber") || "";
+            voucherCode = params.get("voucherCode") || "";
+
+            document.getElementById("trans-amount").innerText = amount.toLocaleString("N0") + "đ";
+
+            startTimer(300); // 5 minutes timer
+        });
+
+        function startTimer(duration) {
+            let timer = duration, minutes, seconds;
+            const display = document.getElementById("timer");
+            const interval = setInterval(function () {
+                minutes = parseInt(timer / 60, 10);
+                seconds = parseInt(timer % 60, 10);
+
+                minutes = minutes < 10 ? "0" + minutes : minutes;
+                seconds = seconds < 10 ? "0" + seconds : seconds;
+
+                display.textContent = minutes + ":" + seconds;
+
+                if (--timer < 0) {
+                    clearInterval(interval);
+                    confirmPayment("24"); // Auto fail on timeout
+                }
+            }, 1000);
+        }
+
+        async function confirmPayment(responseCode) {
+            const alertBox = document.getElementById("alert-box");
+            alertBox.classList.add("hidden");
+
+            try {
+                const res = await apiFetch("CheckoutApi/vnpay-callback", {
+                    method: "POST",
+                    body: {
+                        address,
+                        voucherCode,
+                        responseCode,
+                        receiverName,
+                        phoneNumber
+                    }
+                });
+                const data = await res.ok ? await res.json() : null;
+
+                if (res.ok && data && data.success) {
+                    alertBox.className = "p-4 rounded-xl text-xs font-semibold bg-green-100 text-green-700 block";
+                    alertBox.innerText = "Thanh toán thành công! Đang chuyển hướng về cửa hàng...";
+                    setTimeout(() => {
+                        window.location.href = `confirmation.html?orderId=${data.orderId}`;
+                    }, 1500);
+                } else {
+                    alertBox.className = "p-4 rounded-xl text-xs font-semibold bg-rose-100 text-rose-700 block";
+                    alertBox.innerText = "Giao dịch không thành công hoặc bị hủy. Đang quay lại giỏ hàng...";
+                    setTimeout(() => {
+                        window.location.href = "cart.html";
+                    }, 2000);
+                }
+            } catch (e) {
+                console.error("VNPay callback logic error:", e);
+                alertBox.className = "p-4 rounded-xl text-xs font-semibold bg-rose-100 text-rose-700 block";
+                alertBox.innerText = "Có lỗi xảy ra khi xác thực giao dịch.";
+            }
+        }
+    </script>
+</body>
+</html>

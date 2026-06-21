@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ClothingShop - Thanh Toán</title>
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                    },
+                    colors: {
+                        indigo: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50 text-gray-900 font-sans flex flex-col min-h-screen">
+
+    <main class="flex-1 py-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+        <h1 class="text-3xl font-black text-gray-900 tracking-tight mb-8">Thanh Toán Đơn Hàng</h1>
+        
+        <div id="alert-box" class="hidden mb-6 p-4 rounded-xl text-xs font-semibold"></div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Checkout Form -->
+            <div class="lg:col-span-2 space-y-6">
+                <!-- Shipping Info -->
+                <div class="bg-white border border-gray-150 rounded-3xl p-6 sm:p-8 shadow-sm space-y-4">
+                    <h3 class="font-bold text-xs uppercase text-gray-400 tracking-wider flex items-center space-x-2">
+                        <i class="fa-solid fa-truck-ramp-box text-gray-500"></i>
+                        <span>Thông tin giao hàng</span>
+                    </h3>
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xxs font-bold text-gray-500 uppercase tracking-wider mb-2">Họ & tên người nhận:</label>
+                            <input type="text" id="receiver-name" placeholder="Nguyễn Văn A" class="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-gray-50/50" required>
+                        </div>
+                        <div>
+                            <label class="block text-xxs font-bold text-gray-500 uppercase tracking-wider mb-2">Số điện thoại:</label>
+                            <input type="tel" id="receiver-phone" placeholder="0901234567" class="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-gray-50/50" required>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xxs font-bold text-gray-500 uppercase tracking-wider mb-2">Địa chỉ giao hàng:</label>
+                        <input type="text" id="receiver-address" placeholder="Số 123 Đường Lê Lợi, Quận 1, TP. HCM" class="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-gray-50/50" required>
+                    </div>
+                </div>
+
+                <!-- Payment Methods -->
+                <div class="bg-white border border-gray-150 rounded-3xl p-6 sm:p-8 shadow-sm space-y-4">
+                    <h3 class="font-bold text-xs uppercase text-gray-400 tracking-wider flex items-center space-x-2">
+                        <i class="fa-solid fa-credit-card text-gray-500"></i>
+                        <span>Phương thức thanh toán</span>
+                    </h3>
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <label class="relative border border-gray-200 hover:border-indigo-500 rounded-2xl p-4 flex items-center justify-between cursor-pointer group hover:bg-indigo-50/10 transition">
+                            <div class="flex items-center space-x-3">
+                                <i class="fa-solid fa-truck text-lg text-gray-400 group-hover:text-indigo-600"></i>
+                                <div>
+                                    <h4 class="text-xs font-bold text-gray-800">Thanh toán COD</h4>
+                                    <p class="text-[9px] text-gray-400">Thanh toán bằng tiền mặt khi nhận hàng</p>
+                                </div>
+                            </div>
+                            <input type="radio" name="payment-method" value="COD" checked class="text-indigo-600 focus:ring-indigo-500">
+                        </label>
+
+                        <label class="relative border border-gray-200 hover:border-indigo-500 rounded-2xl p-4 flex items-center justify-between cursor-pointer group hover:bg-indigo-50/10 transition">
+                            <div class="flex items-center space-x-3">
+                                <i class="fa-solid fa-globe text-lg text-gray-400 group-hover:text-indigo-600"></i>
+                                <div>
+                                    <h4 class="text-xs font-bold text-gray-800">Thanh toán Online (VNPay)</h4>
+                                    <p class="text-[9px] text-gray-400">Mô phỏng cổng thanh toán VNPay sandbox</p>
+                                </div>
+                            </div>
+                            <input type="radio" name="payment-method" value="VNPay" class="text-indigo-600 focus:ring-indigo-500">
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cart Items Summary & Voucher -->
+            <div class="space-y-6">
+                <!-- Apply Voucher -->
+                <div class="bg-white border border-gray-150 rounded-3xl p-6 shadow-sm space-y-4">
+                    <h3 class="font-bold text-xs uppercase text-gray-400 tracking-wider">Áp dụng mã giảm giá</h3>
+                    <div class="flex space-x-2">
+                        <input type="text" id="voucher-input" placeholder="Mã giảm giá (ví dụ: WELCOME)..." class="flex-1 px-3 py-2 border border-gray-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 uppercase">
+                        <button onclick="applyVoucherCode()" class="px-4 py-2 bg-gray-900 hover:bg-black text-white rounded-xl text-xs font-bold transition">Áp dụng</button>
+                    </div>
+                    <div id="voucher-status" class="hidden text-xxs font-bold"></div>
+                </div>
+
+                <!-- Final Calculations -->
+                <div class="bg-white border border-gray-150 rounded-3xl p-6 shadow-sm space-y-4">
+                    <h3 class="font-bold text-xs uppercase text-gray-400 tracking-wider">Tóm tắt đơn hàng</h3>
+                    
+                    <div class="divide-y divide-gray-100 text-xs">
+                        <div class="flex justify-between py-3">
+                            <span class="text-gray-500">Tổng phụ sản phẩm</span>
+                            <span id="summary-subtotal" class="font-bold text-gray-800">0đ</span>
+                        </div>
+                        <div class="flex justify-between py-3" id="discount-row" style="display: none;">
+                            <span class="text-gray-500">Giảm giá mã</span>
+                            <span id="summary-discount" class="font-bold text-rose-500">0đ</span>
+                        </div>
+                        <div class="flex justify-between py-3">
+                            <span class="text-gray-500">Phí giao hàng</span>
+                            <span class="font-bold text-green-600">Miễn phí</span>
+                        </div>
+                        <div class="flex justify-between py-4 text-sm font-black">
+                            <span class="text-gray-900">Tổng cộng</span>
+                            <span id="summary-total" class="text-indigo-600">0đ</span>
+                        </div>
+                    </div>
+
+                    <button onclick="submitCheckout()" class="w-full py-3.5 bg-indigo-600 hover:bg-indigo-750 text-white rounded-full text-xs font-bold transition shadow-lg shadow-indigo-500/10 flex items-center justify-center space-x-2">
+                        <span>Xác Nhận Đặt Hàng</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- JS scripts -->
+    <script src="js/app.js"></script>
+    <script>
+        let subtotal = 0;
+        let discountAmount = 0;
+        let appliedVoucher = "";
+
+        document.addEventListener("DOMContentLoaded", async () => {
+            // Ensure login state
+            const user = getCurrentUser();
+            if (!user) {
+                // Must log in to checkout (enforces Identity requirement)
+                window.location.href = "login.html?returnUrl=checkout.html";
+                return;
+            }
+
+            // Prefill user data
+            document.getElementById("receiver-name").value = user.fullName || "";
+            document.getElementById("receiver-phone").value = user.phoneNumber || "";
+            document.getElementById("receiver-address").value = user.address || "";
+
+            await loadCheckoutSummary();
+        });
+
+        async function loadCheckoutSummary() {
+            const items = await getCartItems();
+            if (items.length === 0) {
+                window.location.href = "cart.html";
+                return;
+            }
+
+            subtotal = items.reduce((sum, item) => sum + item.totalPrice, 0);
+            updateSummaryDisplay();
+        }
+
+        function updateSummaryDisplay() {
+            document.getElementById("summary-subtotal").innerText = subtotal.toLocaleString("N0") + "đ";
+            
+            const total = Math.max(0, subtotal - discountAmount);
+            document.getElementById("summary-total").innerText = total.toLocaleString("N0") + "đ";
+
+            const discRow = document.getElementById("discount-row");
+            if (discountAmount > 0) {
+                discRow.style.display = "flex";
+                document.getElementById("summary-discount").innerText = "-" + discountAmount.toLocaleString("N0") + "đ";
+            } else {
+                discRow.style.display = "none";
+            }
+        }
+
+        async function applyVoucherCode() {
+            const code = document.getElementById("voucher-input").value.trim().toUpperCase();
+            const status = document.getElementById("voucher-status");
+            status.classList.remove("hidden", "text-rose-500", "text-green-600");
+
+            if (!code) {
+                status.classList.add("text-rose-500");
+                status.innerText = "Vui lòng nhập mã giảm giá.";
+                status.classList.remove("hidden");
+                return;
+            }
+
+            try {
+                const res = await apiFetch("CheckoutApi/apply-voucher", {
+                    method: "POST",
+                    body: { code }
+                });
+                const data = await res.json();
+                
+                if (res.ok && data.success) {
+                    appliedVoucher = data.code;
+                    if (data.percent) {
+                        discountAmount = subtotal * data.percent / 100;
+                    } else {
+                        discountAmount = data.amount || 0;
+                    }
+                    discountAmount = Math.min(discountAmount, subtotal);
+
+                    status.classList.add("text-green-600");
+                    status.innerText = `Áp dụng mã ${data.code} thành công! Giảm ${discountAmount.toLocaleString("N0")}đ`;
+                    status.classList.remove("hidden");
+
+                    updateSummaryDisplay();
+                } else {
+                    status.classList.add("text-rose-500");
+                    status.innerText = data.message || "Mã không hợp lệ.";
+                    status.classList.remove("hidden");
+                    
+                    discountAmount = 0;
+                    appliedVoucher = "";
+                    updateSummaryDisplay();
+                }
+            } catch (e) {
+                console.error("Voucher application error:", e);
+            }
+        }
+
+        async function submitCheckout() {
+            const receiverName = document.getElementById("receiver-name").value.trim();
+            const phoneNumber = document.getElementById("receiver-phone").value.trim();
+            const address = document.getElementById("receiver-address").value.trim();
+            const paymentMethod = document.querySelector('input[name="payment-method"]:checked').value;
+
+            const alertBox = document.getElementById("alert-box");
+            alertBox.classList.add("hidden");
+
+            if (!receiverName || !phoneNumber || !address) {
+                alertBox.classList.remove("hidden", "bg-green-150", "text-green-700");
+                alertBox.classList.add("bg-rose-100", "text-rose-700");
+                alertBox.innerText = "Vui lòng điền đầy đủ thông tin giao hàng.";
+                alertBox.scrollIntoView({ behavior: 'smooth' });
+                return;
+            }
+
+            try {
+                const res = await apiFetch("CheckoutApi/place-order", {
+                    method: "POST",
+                    body: {
+                        address,
+                        paymentMethod,
+                        voucherCode: appliedVoucher,
+                        receiverName,
+                        phoneNumber
+                    }
+                });
+                const data = await res.json();
+                
+                if (res.ok) {
+                    if (data.requiresRedirect) {
+                        // Redirect to simulated VNPay gateway
+                        window.location.href = data.redirectUrl;
+                    } else {
+                        // COD successful
+                        window.location.href = `confirmation.html?orderId=${data.orderId}`;
+                    }
+                } else {
+                    alertBox.classList.remove("hidden");
+                    alertBox.classList.add("bg-rose-100", "text-rose-700");
+                    alertBox.innerText = data.message || "Không thể đặt hàng. Vui lòng kiểm tra lại.";
+                    alertBox.scrollIntoView({ behavior: 'smooth' });
+                }
+            } catch (e) {
+                console.error("Checkout submit error:", e);
+            }
+        }
+    </script>
+</body>
+</html>

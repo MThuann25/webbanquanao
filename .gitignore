@@ -1,0 +1,19 @@
+# Build and Release Folders
+bin/
+obj/
+[Rr]elease/
+[Dd]ebug/
+
+# IDEs and Editors
+.vs/
+.vscode/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# OS files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+.DS_Store

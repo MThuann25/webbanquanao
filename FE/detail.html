@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ClothingShop - Chi Tiết Sản Phẩm</title>
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                    },
+                    colors: {
+                        indigo: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50 text-gray-900 font-sans flex flex-col min-h-screen">
+
+    <!-- Detail Content -->
+    <main class="flex-1 py-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+        <!-- Message box -->
+        <div id="alert-box" class="hidden mb-6 p-4 rounded-xl text-xs font-semibold"></div>
+
+        <div class="bg-white rounded-3xl border border-gray-150 shadow-sm p-6 sm:p-10 mb-12">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12" id="detail-loading">
+                <!-- Loader -->
+                <div class="col-span-full text-center py-12 text-gray-400">
+                    <i class="fa-solid fa-spinner animate-spin text-3xl mb-3"></i>
+                    <p>Đang tải thông tin chi tiết sản phẩm...</p>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 hidden" id="detail-content">
+                <!-- Images Area -->
+                <div class="space-y-4">
+                    <div class="aspect-square bg-gray-150 rounded-2xl overflow-hidden border border-gray-100">
+                        <img id="main-product-img" src="" alt="" class="w-full h-full object-cover">
+                    </div>
+                    <div id="sub-images-gallery" class="flex gap-3 overflow-x-auto py-1">
+                        <!-- Sub images -->
+                    </div>
+                </div>
+
+                <!-- Info Area -->
+                <div class="space-y-6">
+                    <div>
+                        <span id="product-brand" class="text-xs text-indigo-600 uppercase font-black tracking-widest"></span>
+                        <h1 id="product-name" class="text-2xl sm:text-3xl font-black text-gray-900 tracking-tight mt-1"></h1>
+                    </div>
+
+                    <!-- Price -->
+                    <div class="flex items-baseline space-x-3 py-2 border-y border-gray-100">
+                        <span id="product-discount-price" class="text-2xl font-black text-rose-500"></span>
+                        <span id="product-original-price" class="text-sm line-through text-gray-400"></span>
+                    </div>
+
+                    <!-- Description -->
+                    <p id="product-description" class="text-xs text-gray-500 leading-relaxed"></p>
+
+                    <!-- Sizes Selector -->
+                    <div>
+                        <h3 class="text-xs font-bold text-gray-700 uppercase tracking-wider mb-3">Chọn Kích thước:</h3>
+                        <div id="product-sizes" class="flex flex-wrap gap-2">
+                            <!-- Sizes -->
+                        </div>
+                    </div>
+
+                    <!-- Colors Selector -->
+                    <div>
+                        <h3 class="text-xs font-bold text-gray-700 uppercase tracking-wider mb-3">Chọn Màu sắc:</h3>
+                        <div id="product-colors" class="flex flex-wrap gap-2">
+                            <!-- Colors -->
+                        </div>
+                    </div>
+
+                    <!-- Add to Cart -->
+                    <div class="pt-4 space-y-4">
+                        <div class="flex items-center space-x-4">
+                            <span class="text-xs font-bold text-gray-700 uppercase">Số lượng:</span>
+                            <div class="flex items-center border border-gray-200 rounded-xl overflow-hidden bg-gray-50">
+                                <button onclick="adjustQty(-1)" class="px-3 py-2 hover:bg-gray-100 transition text-sm font-semibold"><i class="fa-solid fa-minus"></i></button>
+                                <span id="cart-qty" class="px-4 py-2 text-xs font-bold w-12 text-center bg-white">1</span>
+                                <button onclick="adjustQty(1)" class="px-3 py-2 hover:bg-gray-100 transition text-sm font-semibold"><i class="fa-solid fa-plus"></i></button>
+                            </div>
+                            <span id="stock-warning" class="text-xxs text-gray-400 font-semibold"></span>
+                        </div>
+
+                        <button id="add-to-cart-btn" onclick="handleAddToCart()" class="w-full sm:w-auto px-10 py-3.5 bg-indigo-600 hover:bg-indigo-750 text-white rounded-full text-xs font-bold transition shadow-lg shadow-indigo-500/10 flex items-center justify-center space-x-2">
+                            <i class="fa-solid fa-cart-arrow-down text-sm"></i>
+                            <span>Thêm Vào Giỏ Hàng</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reviews Area -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-12 mb-12">
+            <!-- Reviews List -->
+            <div class="lg:col-span-2 space-y-6">
+                <h2 class="text-xl font-black text-gray-900 tracking-tight flex items-center space-x-2">
+                    <i class="fa-regular fa-comments text-gray-500"></i>
+                    <span>Khách Hàng Đánh Giá</span>
+                </h2>
+                <div id="reviews-box" class="space-y-4">
+                    <!-- Reviews list -->
+                </div>
+            </div>
+
+            <!-- Review Form -->
+            <div class="bg-white rounded-3xl border border-gray-150 shadow-sm p-6 self-start space-y-4">
+                <h3 class="font-bold text-xs uppercase text-gray-400 tracking-wider">Viết Đánh Giá</h3>
+                <div id="review-auth-warning" class="hidden text-xxs text-gray-500">Bạn cần <a href="login.html" class="text-indigo-600 font-bold hover:underline">Đăng nhập</a> để bình luận.</div>
+                
+                <form id="review-form" class="space-y-4" onsubmit="submitReview(event)">
+                    <div>
+                        <label class="block text-xxs font-bold text-gray-500 uppercase tracking-wider mb-2">Đánh giá sao:</label>
+                        <select id="review-rating" class="w-full px-3 py-2 border border-gray-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            <option value="5">⭐⭐⭐⭐⭐ 5 Sao</option>
+                            <option value="4">⭐⭐⭐⭐ 4 Sao</option>
+                            <option value="3">⭐⭐⭐ 3 Sao</option>
+                            <option value="2">⭐⭐ 2 Sao</option>
+                            <option value="1">⭐ 1 Sao</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xxs font-bold text-gray-500 uppercase tracking-wider mb-2">Nội dung bình luận:</label>
+                        <textarea id="review-comment" rows="4" placeholder="Chia sẻ cảm nhận của bạn về sản phẩm..." class="w-full px-4 py-3 border border-gray-200 rounded-2xl text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-gray-50/50" required></textarea>
+                    </div>
+                    <button type="submit" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition shadow-md shadow-indigo-100">Gửi Đánh Giá</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Related Products -->
+        <section class="border-t border-gray-150 pt-12">
+            <h2 class="text-xl font-black text-gray-900 tracking-tight mb-8">Có Thể Bạn Cũng Thích</h2>
+            <div id="related-products" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                <!-- Related product cards -->
+            </div>
+        </section>
+    </main>
+
+    <!-- JS scripts -->
+    <script src="js/app.js"></script>
+    <script>
+        let productId = null;
+        let productData = null;
+        let currentQty = 1;
+        
+        let selectedSize = null;
+        let selectedColor = null;
+
+        document.addEventListener("DOMContentLoaded", async () => {
+            const params = new URLSearchParams(window.location.search);
+            productId = parseInt(params.get("id"));
+            if (!productId) {
+                window.location.href = "shop.html";
+                return;
+            }
+
+            await loadProductDetails();
+            checkReviewAuth();
+        });
+
+        function checkReviewAuth() {
+            const user = getCurrentUser();
+            const form = document.getElementById("review-form");
+            const warning = document.getElementById("review-auth-warning");
+            
+            if (user) {
+                form.classList.remove("hidden");
+                warning.classList.add("hidden");
+            } else {
+                form.classList.add("hidden");
+                warning.classList.remove("hidden");
+            }
+        }
+
+        async function loadProductDetails() {
+            try {
+                const res = await apiFetch(`ProductApi/${productId}`);
+                if (res.ok) {
+                    productData = await res.json();
+                    
+                    document.getElementById("detail-loading").classList.add("hidden");
+                    document.getElementById("detail-content").classList.remove("hidden");
+
+                    // Map info
+                    document.getElementById("product-brand").innerText = productData.brandName || "Fashion";
+                    document.getElementById("product-name").innerText = productData.name;
+                    document.getElementById("product-description").innerText = productData.description;
+
+                    // Images
+                    const mainImage = productData.images.find(img => img.isMain)?.imageUrl || "https://images.unsplash.com/photo-1523381210434-271e8be1f52b?w=400";
+                    document.getElementById("main-product-img").src = mainImage;
+
+                    const gallery = document.getElementById("sub-images-gallery");
+                    gallery.innerHTML = "";
+                    productData.images.forEach(img => {
+                        gallery.innerHTML += `
+                            <button onclick="setMainImage('${img.imageUrl}')" class="w-20 h-20 border border-gray-250 rounded-xl overflow-hidden hover:border-indigo-600 transition flex-shrink-0">
+                                <img src="${img.imageUrl}" class="w-full h-full object-cover">
+                            </button>
+                        `;
+                    });
+
+                    // Pricing
+                    if (productData.discountPrice) {
+                        document.getElementById("product-discount-price").innerText = productData.discountPrice.toLocaleString("N0") + "đ";
+                        document.getElementById("product-original-price").innerText = productData.price.toLocaleString("N0") + "đ";
+                    } else {
+                        document.getElementById("product-discount-price").innerText = productData.price.toLocaleString("N0") + "đ";
+                        document.getElementById("product-original-price").innerText = "";
+                    }
+
+                    // Sizes and Colors from variants
+                    const uniqueSizes = [...new Set(productData.variants.map(v => v.size))];
+                    const uniqueColors = [...new Set(productData.variants.map(v => v.color))];
+
+                    const sizeBox = document.getElementById("product-sizes");
+                    sizeBox.innerHTML = "";
+                    uniqueSizes.forEach(s => {
+                        sizeBox.innerHTML += `
+                            <button onclick="selectSize('${s}')" id="btn-size-${s}" class="size-select-btn px-4 py-2 border border-gray-200 hover:border-indigo-600 hover:text-indigo-600 rounded-xl text-xs font-semibold transition bg-white text-gray-600">
+                                ${s}
+                            </button>
+                        `;
+                    });
+
+                    const colorBox = document.getElementById("product-colors");
+                    colorBox.innerHTML = "";
+                    uniqueColors.forEach(c => {
+                        colorBox.innerHTML += `
+                            <button onclick="selectColor('${c}')" id="btn-color-${c}" class="color-select-btn px-4 py-2 border border-gray-200 hover:border-indigo-600 hover:text-indigo-600 rounded-xl text-xs font-semibold transition bg-white text-gray-600">
+                                ${c}
+                            </button>
+                        `;
+                    });
+
+                    // Default Selects
+                    if (uniqueSizes.length > 0) selectSize(uniqueSizes[0]);
+                    if (uniqueColors.length > 0) selectColor(uniqueColors[0]);
+
+                    // Reviews
+                    const reviewsBox = document.getElementById("reviews-box");
+                    reviewsBox.innerHTML = "";
+                    if (productData.reviews && productData.reviews.length > 0) {
+                        productData.reviews.forEach(r => {
+                            reviewsBox.innerHTML += `
+                                <div class="bg-white border border-gray-100 rounded-2xl p-5 shadow-sm space-y-2">
+                                    <div class="flex justify-between items-center">
+                                        <h4 class="font-bold text-sm text-gray-800">${r.userName}</h4>
+                                        <span class="text-xxs text-gray-400">${r.createdDate}</span>
+                                    </div>
+                                    <div class="text-amber-400 text-xs">${"⭐".repeat(r.rating)}</div>
+                                    <p class="text-xs text-gray-500 leading-relaxed">${r.comment}</p>
+                                </div>
+                            `;
+                        });
+                    } else {
+                        reviewsBox.innerHTML = `<div class="bg-white border border-dashed border-gray-200 rounded-2xl p-8 text-center text-gray-400 text-xs">Chưa có đánh giá nào cho sản phẩm này. Hãy là người đầu tiên!</div>`;
+                    }
+
+                    // Related Products
+                    const relatedGrid = document.getElementById("related-products");
+                    relatedGrid.innerHTML = "";
+                    if (productData.relatedProducts && productData.relatedProducts.length > 0) {
+                        productData.relatedProducts.forEach(p => {
+                            const relatedPrice = p.discountPrice 
+                                ? `<span class="text-xs font-black text-rose-500">${p.discountPrice.toLocaleString("N0")}đ</span>` 
+                                : `<span class="text-xs font-bold text-gray-900">${p.price.toLocaleString("N0")}đ</span>`;
+                            
+                            relatedGrid.innerHTML += `
+                                <div class="group bg-white rounded-3xl border border-gray-100 overflow-hidden hover:shadow-xl hover:shadow-indigo-500/5 transition duration-300 flex flex-col">
+                                    <div class="relative overflow-hidden aspect-[4/5] bg-gray-100">
+                                        <img src="${p.imageUrl}" alt="${p.name}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                                    </div>
+                                    <div class="p-4 flex-1 flex flex-col justify-between">
+                                        <h3 class="font-bold text-xs text-gray-800 line-clamp-2 min-h-[32px] group-hover:text-indigo-600 transition"><a href="detail.html?id=${p.id}">${p.name}</a></h3>
+                                        <div class="mt-2 flex justify-between items-center">
+                                            ${relatedPrice}
+                                            <a href="detail.html?id=${p.id}" class="text-[10px] text-indigo-600 font-bold hover:underline">Chi tiết</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                        });
+                    } else {
+                        relatedGrid.innerHTML = `<div class="col-span-full text-center text-gray-400 text-xs py-4">Không có sản phẩm liên quan.</div>`;
+                    }
+
+                }
+            } catch (e) {
+                console.error("Error loading product detail info:", e);
+            }
+        }
+
+        function setMainImage(url) {
+            document.getElementById("main-product-img").src = url;
+        }
+
+        function selectSize(s) {
+            selectedSize = s;
+            document.querySelectorAll(".size-select-btn").forEach(el => el.classList.remove("border-indigo-600", "text-indigo-600", "bg-indigo-50"));
+            const activeBtn = document.getElementById(`btn-size-${s}`);
+            if (activeBtn) activeBtn.classList.add("border-indigo-600", "text-indigo-600", "bg-indigo-50");
+            updateVariantInfo();
+        }
+
+        function selectColor(c) {
+            selectedColor = c;
+            document.querySelectorAll(".color-select-btn").forEach(el => el.classList.remove("border-indigo-600", "text-indigo-600", "bg-indigo-50"));
+            const activeBtn = document.getElementById(`btn-color-${c}`);
+            if (activeBtn) activeBtn.classList.add("border-indigo-600", "text-indigo-600", "bg-indigo-50");
+            updateVariantInfo();
+        }
+
+        function updateVariantInfo() {
+            if (!productData || !selectedSize || !selectedColor) return;
+            const variant = productData.variants.find(v => v.size === selectedSize && v.color === selectedColor);
+            const warning = document.getElementById("stock-warning");
+            
+            if (variant) {
+                if (variant.stock <= 0) {
+                    warning.innerHTML = `<span class="text-rose-500 font-bold">Hết hàng</span>`;
+                    document.getElementById("add-to-cart-btn").disabled = true;
+                    document.getElementById("add-to-cart-btn").classList.add("opacity-50", "pointer-events-none");
+                } else {
+                    warning.innerHTML = `Còn ${variant.stock} sản phẩm trong kho`;
+                    document.getElementById("add-to-cart-btn").disabled = false;
+                    document.getElementById("add-to-cart-btn").classList.remove("opacity-50", "pointer-events-none");
+                }
+            } else {
+                warning.innerHTML = `<span class="text-rose-500 font-bold">Không sẵn có</span>`;
+                document.getElementById("add-to-cart-btn").disabled = true;
+                document.getElementById("add-to-cart-btn").classList.add("opacity-50", "pointer-events-none");
+            }
+        }
+
+        function adjustQty(amount) {
+            const warning = document.getElementById("stock-warning");
+            if (!productData || !selectedSize || !selectedColor) return;
+            const variant = productData.variants.find(v => v.size === selectedSize && v.color === selectedColor);
+            if (!variant) return;
+
+            const nextQty = currentQty + amount;
+            if (nextQty >= 1 && nextQty <= variant.stock) {
+                currentQty = nextQty;
+                document.getElementById("cart-qty").innerText = currentQty;
+            }
+        }
+
+        async function handleAddToCart() {
+            if (!productData || !selectedSize || !selectedColor) return;
+            const variant = productData.variants.find(v => v.size === selectedSize && v.color === selectedColor);
+            if (!variant) return;
+
+            const res = await addToCart(variant.id, currentQty);
+            const box = document.getElementById("alert-box");
+            box.classList.remove("hidden", "bg-rose-100", "text-rose-700", "bg-green-100", "text-green-700");
+            
+            if (res.success) {
+                box.classList.add("bg-green-100", "text-green-700");
+                box.innerText = res.message;
+            } else {
+                box.classList.add("bg-rose-100", "text-rose-700");
+                box.innerText = res.message;
+            }
+            box.scrollIntoView({ behavior: 'smooth', block: 'end' });
+        }
+
+        async function submitReview(event) {
+            event.preventDefault();
+            const rating = parseInt(document.getElementById("review-rating").value);
+            const comment = document.getElementById("review-comment").value.trim();
+
+            if (!comment) return;
+
+            try {
+                const res = await apiFetch(`ProductApi/${productId}/reviews`, {
+                    method: "POST",
+                    body: { rating, comment }
+                });
+                const data = await res.json();
+                
+                const box = document.getElementById("alert-box");
+                box.classList.remove("hidden", "bg-rose-100", "text-rose-700", "bg-green-100", "text-green-700");
+                
+                if (res.ok) {
+                    box.classList.add("bg-green-100", "text-green-700");
+                    box.innerText = data.message;
+                    document.getElementById("review-comment").value = "";
+                    await loadProductDetails(); // Reload reviews list
+                } else {
+                    box.classList.add("bg-rose-100", "text-rose-700");
+                    box.innerText = data.message;
+                }
+                box.scrollIntoView({ behavior: 'smooth', block: 'end' });
+            } catch (e) {
+                console.error("Error submitting product rating review:", e);
+            }
+        }
+    </script>
+</body>
+</html>

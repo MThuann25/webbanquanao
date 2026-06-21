@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ClothingShop - Đặt Hàng Thành Công</title>
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                    },
+                    colors: {
+                        indigo: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50 text-gray-900 font-sans flex flex-col min-h-screen">
+
+    <main class="flex-1 py-12 max-w-2xl mx-auto px-4 w-full flex items-center justify-center">
+        <div class="bg-white border border-gray-150 rounded-3xl p-6 sm:p-10 shadow-xl w-full text-center space-y-6">
+            <!-- Icon -->
+            <div class="w-16 h-16 bg-green-50 text-green-500 rounded-full flex items-center justify-center mx-auto text-3xl shadow">
+                <i class="fa-solid fa-circle-check"></i>
+            </div>
+            
+            <!-- Thanks -->
+            <div class="space-y-2">
+                <h1 class="text-2xl sm:text-3xl font-black text-gray-900 tracking-tight">Đặt Hàng Thành Công!</h1>
+                <p class="text-xs text-gray-500 leading-relaxed">Cảm ơn bạn đã lựa chọn mua sắm tại ClothingShop. Mã đơn hàng của bạn đã được thiết lập thành công dưới đây.</p>
+            </div>
+
+            <!-- Receipt Info -->
+            <div id="receipt-details" class="bg-gray-50 border border-gray-100 rounded-2xl p-5 divide-y divide-gray-200/60 text-xs text-left space-y-3">
+                <!-- Loaded dynamically -->
+                <div class="text-center py-4 text-gray-400">
+                    <i class="fa-solid fa-spinner animate-spin text-lg mr-2"></i> Đang tải thông tin hóa đơn...
+                </div>
+            </div>
+
+            <!-- Action buttons -->
+            <div class="flex flex-col sm:flex-row gap-3 pt-2">
+                <a href="shop.html" class="flex-1 py-3 bg-indigo-600 hover:bg-indigo-750 text-white rounded-full text-xs font-bold transition shadow-lg shadow-indigo-500/10">Tiếp Tục Mua Sắm</a>
+                <a href="profile.html#orders" class="flex-1 py-3 border border-gray-200 hover:bg-gray-50 text-gray-600 rounded-full text-xs font-bold transition">Xem Đơn Hàng Của Tôi</a>
+            </div>
+        </div>
+    </main>
+
+    <!-- JS script calls -->
+    <script src="js/app.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", async () => {
+            const params = new URLSearchParams(window.location.search);
+            const orderId = parseInt(params.get("orderId"));
+            if (!orderId) {
+                window.location.href = "index.html";
+                return;
+            }
+
+            await loadReceipt(orderId);
+        });
+
+        async function loadReceipt(orderId) {
+            const container = document.getElementById("receipt-details");
+            try {
+                const res = await apiFetch(`AuthApi/orders/${orderId}`);
+                if (res.ok) {
+                    const data = await res.json();
+                    
+                    let itemsHtml = "";
+                    data.items.forEach(item => {
+                        itemsHtml += `
+                            <div class="flex justify-between py-1.5 text-[11px] text-gray-500">
+                                <span>${item.productName} (Size ${item.size} / Màu ${item.color}) x${item.quantity}</span>
+                                <span>${(item.unitPrice * item.quantity).toLocaleString("N0")}đ</span>
+                            </div>
+                        `;
+                    });
+
+                    container.innerHTML = `
+                        <div class="flex justify-between py-2">
+                            <span class="text-gray-500">Mã đơn hàng</span>
+                            <span class="font-bold text-gray-800">#CS${data.id}</span>
+                        </div>
+                        <div class="flex justify-between py-2">
+                            <span class="text-gray-500">Ngày đặt hàng</span>
+                            <span class="font-semibold text-gray-800">${data.orderDate}</span>
+                        </div>
+                        <div class="flex justify-between py-2">
+                            <span class="text-gray-500">Người nhận</span>
+                            <span class="font-semibold text-gray-800">${data.receiverName || "Khách hàng"}</span>
+                        </div>
+                        <div class="flex justify-between py-2">
+                            <span class="text-gray-500">Số điện thoại</span>
+                            <span class="font-semibold text-gray-800">${data.phoneNumber || "-"}</span>
+                        </div>
+                        <div class="flex justify-between py-2">
+                            <span class="text-gray-500">Địa chỉ nhận</span>
+                            <span class="font-semibold text-gray-800 max-w-[200px] text-right truncate" title="${data.shippingAddress}">${data.shippingAddress}</span>
+                        </div>
+                        <div class="flex justify-between py-2">
+                            <span class="text-gray-500">Phương thức thanh toán</span>
+                            <span class="font-semibold text-indigo-600">${data.paymentMethod}</span>
+                        </div>
+                        <div class="py-2">
+                            <span class="text-gray-500 block mb-2 font-bold uppercase tracking-wider text-[10px]">Danh sách sản phẩm mua</span>
+                            <div class="space-y-1">
+                                ${itemsHtml}
+                            </div>
+                        </div>
+                        <div class="flex justify-between py-3 text-sm font-black border-t border-gray-200">
+                            <span class="text-gray-900">Tổng thanh toán</span>
+                            <span class="text-rose-500">${data.totalAmount.toLocaleString("N0")}đ</span>
+                        </div>
+                    `;
+                } else {
+                    container.innerHTML = `<div class="text-center py-4 text-red-500">Không tìm thấy thông tin đơn hàng #${orderId}.</div>`;
+                }
+            } catch (e) {
+                container.innerHTML = `<div class="text-center py-4 text-red-500">Lỗi kết nối máy chủ.</div>`;
+            }
+        }
+    </script>
+</body>
+</html>

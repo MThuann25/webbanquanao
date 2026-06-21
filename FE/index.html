@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ClothingShop - Hệ thống thời trang hàng đầu</title>
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                    },
+                    colors: {
+                        indigo: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50 text-gray-900 font-sans flex flex-col min-h-screen">
+
+    <!-- Hero Section -->
+    <section class="relative bg-gradient-to-br from-indigo-900 via-slate-900 to-indigo-950 text-white overflow-hidden py-24 sm:py-32">
+        <div class="absolute inset-0 opacity-10 bg-[radial-gradient(#4f46e5_1px,transparent_1px)] [background-size:16px_16px]"></div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <div class="space-y-6 text-center lg:text-left">
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">BST HÈ 2026</span>
+                    <h1 class="text-4xl sm:text-6xl font-black tracking-tight leading-none text-white">Định hình<br><span class="bg-gradient-to-r from-indigo-400 to-violet-400 bg-clip-text text-transparent">Phong Cách Riêng</span></h1>
+                    <p class="text-base sm:text-lg text-gray-300 max-w-lg mx-auto lg:mx-0">Khám phá các bộ sưu tập mới nhất với chất liệu thoáng mát, phom dáng hiện đại giúp bạn tự tin tỏa sáng mọi lúc mọi nơi.</p>
+                    <div class="flex flex-col sm:flex-row justify-center lg:justify-start gap-4">
+                        <a href="shop.html" class="bg-indigo-600 hover:bg-indigo-750 text-white px-8 py-3 rounded-full text-sm font-bold transition shadow-lg shadow-indigo-500/20 flex items-center justify-center space-x-2">
+                            <span>Mua Sắm Ngay</span>
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </a>
+                        <a href="#categories" class="border border-white/20 hover:bg-white/10 text-white px-8 py-3 rounded-full text-sm font-semibold transition flex items-center justify-center">Tìm hiểu thêm</a>
+                    </div>
+                </div>
+                <div class="relative hidden lg:block">
+                    <div class="absolute -inset-1 rounded-3xl bg-gradient-to-r from-indigo-500 to-violet-500 opacity-30 blur-2xl animate-pulse"></div>
+                    <img src="https://images.unsplash.com/photo-1483985988355-763728e1935b?w=600&auto=format&fit=crop&q=60" alt="BST Mới" class="relative rounded-3xl w-full h-[400px] object-cover shadow-2xl">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Categories Section -->
+    <section id="categories" class="py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center max-w-xl mx-auto mb-12">
+            <h2 class="text-3xl font-black text-gray-900 tracking-tight">Mua Theo Danh Mục</h2>
+            <p class="text-sm text-gray-500 mt-2">Dễ dàng lựa chọn sản phẩm phù hợp cho nhu cầu của bạn</p>
+        </div>
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6">
+            <a href="shop.html?categoryId=1" class="group bg-white rounded-2xl p-6 text-center border border-gray-100 hover:border-indigo-200 hover:shadow-xl hover:shadow-indigo-500/5 transition duration-300">
+                <div class="w-16 h-16 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition duration-300">
+                    <i class="fa-solid fa-shirt text-2xl"></i>
+                </div>
+                <h3 class="font-bold text-sm text-gray-800">Áo Nam</h3>
+            </a>
+            <a href="shop.html?categoryId=2" class="group bg-white rounded-2xl p-6 text-center border border-gray-100 hover:border-indigo-200 hover:shadow-xl hover:shadow-indigo-500/5 transition duration-300">
+                <div class="w-16 h-16 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition duration-300">
+                    <i class="fa-solid fa-lines-leaning text-2xl"></i>
+                </div>
+                <h3 class="font-bold text-sm text-gray-800">Quần Nam</h3>
+            </a>
+            <a href="shop.html?categoryId=3" class="group bg-white rounded-2xl p-6 text-center border border-gray-100 hover:border-indigo-200 hover:shadow-xl hover:shadow-indigo-500/5 transition duration-300">
+                <div class="w-16 h-16 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition duration-300">
+                    <i class="fa-solid fa-person-dress text-2xl"></i>
+                </div>
+                <h3 class="font-bold text-sm text-gray-800">Áo Nữ</h3>
+            </a>
+            <a href="shop.html?categoryId=4" class="group bg-white rounded-2xl p-6 text-center border border-gray-100 hover:border-indigo-200 hover:shadow-xl hover:shadow-indigo-500/5 transition duration-300">
+                <div class="w-16 h-16 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition duration-300">
+                    <i class="fa-solid fa-person-dress-burst text-2xl"></i>
+                </div>
+                <h3 class="font-bold text-sm text-gray-800">Váy Nữ</h3>
+            </a>
+            <a href="shop.html?categoryId=5" class="group bg-white rounded-2xl p-6 text-center border border-gray-100 hover:border-indigo-200 hover:shadow-xl hover:shadow-indigo-500/5 transition duration-300">
+                <div class="w-16 h-16 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition duration-300">
+                    <i class="fa-solid fa-gem text-2xl"></i>
+                </div>
+                <h3 class="font-bold text-sm text-gray-800">Phụ Kiện</h3>
+            </a>
+        </div>
+    </section>
+
+    <!-- Hot Products Section -->
+    <section class="py-16 bg-gray-50 flex-1">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-end mb-10">
+                <div>
+                    <h2 class="text-3xl font-black text-gray-900 tracking-tight">Sản Phẩm Nổi Bật</h2>
+                    <p class="text-sm text-gray-500 mt-2">BST thời trang phong cách bán chạy nhất tuần qua</p>
+                </div>
+                <a href="shop.html" class="text-indigo-600 hover:text-indigo-700 text-sm font-bold flex items-center space-x-1 transition">
+                    <span>Xem tất cả</span>
+                    <i class="fa-solid fa-chevron-right"></i>
+                </a>
+            </div>
+            
+            <div id="featured-products" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                <!-- Dynamic cards populated by script -->
+                <div class="col-span-full text-center py-12 text-gray-400">
+                    <i class="fa-solid fa-spinner animate-spin text-3xl mb-3"></i>
+                    <p>Đang tải danh sách sản phẩm nổi bật...</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- JavaScript config and loaders -->
+    <script src="js/app.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", async () => {
+            await loadFeaturedProducts();
+        });
+
+        async function loadFeaturedProducts() {
+            const container = document.getElementById("featured-products");
+            try {
+                // Call Product API
+                const res = await apiFetch("ProductApi?page=1&pageSize=4");
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.products && data.products.length > 0) {
+                        container.innerHTML = "";
+                        data.products.forEach(p => {
+                            const priceHtml = p.discountPrice 
+                                ? `<span class="text-base font-black text-rose-500">${p.discountPrice.toLocaleString("N0")}đ</span>
+                                   <span class="text-xs line-through text-gray-400 ml-2">${p.price.toLocaleString("N0")}đ</span>` 
+                                : `<span class="text-base font-black text-gray-900">${p.price.toLocaleString("N0")}đ</span>`;
+                            
+                            const card = document.createElement("div");
+                            card.className = "group bg-white rounded-3xl border border-gray-100 overflow-hidden hover:shadow-2xl hover:shadow-indigo-500/5 transition duration-300 flex flex-col";
+                            card.innerHTML = `
+                                <div class="relative overflow-hidden aspect-[4/5] bg-gray-100">
+                                    <img src="${p.imageUrl}" alt="${p.name}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                                    ${p.discountPrice ? `<span class="absolute top-4 left-4 bg-rose-500 text-white text-[10px] font-black tracking-widest px-2.5 py-1 rounded-full uppercase shadow">Giảm giá</span>` : ""}
+                                </div>
+                                <div class="p-6 flex-1 flex flex-col">
+                                    <span class="text-xs text-gray-400 uppercase tracking-widest font-semibold">${p.categoryName || "Danh mục"}</span>
+                                    <h3 class="font-bold text-sm text-gray-800 mt-2 line-clamp-2 min-h-[40px] group-hover:text-indigo-600 transition"><a href="detail.html?id=${p.id}">${p.name}</a></h3>
+                                    <div class="mt-4 flex items-center justify-between">
+                                        <div class="flex flex-col">
+                                            ${priceHtml}
+                                        </div>
+                                        <a href="detail.html?id=${p.id}" class="w-10 h-10 bg-indigo-50 group-hover:bg-indigo-600 text-indigo-600 group-hover:text-white rounded-full flex items-center justify-center transition-all duration-300 shadow shadow-indigo-100">
+                                            <i class="fa-solid fa-cart-shopping text-sm"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            `;
+                            container.appendChild(card);
+                        });
+                    } else {
+                        container.innerHTML = `<div class="col-span-full text-center text-gray-400 py-12">Không có sản phẩm nào.</div>`;
+                    }
+                } else {
+                    container.innerHTML = `<div class="col-span-full text-center text-red-500 py-12">Lỗi tải dữ liệu sản phẩm.</div>`;
+                }
+            } catch (err) {
+                container.innerHTML = `<div class="col-span-full text-center text-red-500 py-12">Lỗi kết nối API: ${err.message}</div>`;
+            }
+        }
+    </script>
+</body>
+</html>
