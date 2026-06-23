@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
@@ -48,7 +48,7 @@
                 <div>
                     <div class="flex justify-between mb-2">
                         <label class="block text-xxs font-bold text-gray-500 uppercase tracking-wider">Mật khẩu:</label>
-                        <a href="#" class="text-xxs text-indigo-650 font-bold hover:underline">Quên mật khẩu?</a>
+                        <a href="javascript:void(0)" onclick="toggleForgotPasswordModal(true)" class="text-xxs text-indigo-650 font-bold hover:underline">Quên mật khẩu?</a>
                     </div>
                     <input type="password" id="login-password" placeholder="••••••" class="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-gray-50/50" required>
                 </div>
@@ -128,6 +128,174 @@
             // Point OAuth redirect to Backend AuthApi controller challenge
             window.location.href = `${API_BASE_URL}/api/AuthApi/externallogin?provider=Google&returnUrl=${window.location.origin}/profile.html`;
         }
+
+        // --- Forgot Password Logic ---
+        function toggleForgotPasswordModal(show) {
+            const modal = document.getElementById("forgot-password-modal");
+            const alertBox = document.getElementById("forgot-alert-box");
+            if (show) {
+                modal.classList.remove("hidden");
+                modal.classList.add("flex");
+                alertBox.classList.add("hidden");
+                backToStepEmail();
+            } else {
+                modal.classList.add("hidden");
+                modal.classList.remove("flex");
+            }
+        }
+
+        function backToStepEmail() {
+            document.getElementById("step-email").classList.remove("hidden");
+            document.getElementById("step-reset").classList.add("hidden");
+            document.getElementById("forgot-otp").value = "";
+            document.getElementById("forgot-new-password").value = "";
+            document.getElementById("forgot-confirm-password").value = "";
+        }
+
+        async function requestOtp() {
+            const email = document.getElementById("forgot-email").value.trim();
+            const alertBox = document.getElementById("forgot-alert-box");
+            const btn = document.getElementById("btn-request-otp");
+
+            if (!email) {
+                alertBox.className = "p-4 rounded-xl text-xs font-semibold bg-rose-100 text-rose-700 block";
+                alertBox.innerText = "Vui lòng nhập địa chỉ email.";
+                alertBox.classList.remove("hidden");
+                return;
+            }
+
+            alertBox.className = "p-4 rounded-xl text-xs font-semibold bg-blue-100 text-blue-700 block";
+            alertBox.innerText = "Đang gửi mã OTP đến email...";
+            alertBox.classList.remove("hidden");
+            btn.disabled = true;
+
+            try {
+                const res = await apiFetch("AuthApi/forgot-password", {
+                    method: "POST",
+                    body: { email }
+                });
+                const data = await res.json();
+
+                if (res.ok) {
+                    alertBox.className = "p-4 rounded-xl text-xs font-semibold bg-green-100 text-green-700 block";
+                    alertBox.innerText = data.message || "Đã gửi mã OTP thành công! Vui lòng kiểm tra email.";
+                    
+                    setTimeout(() => {
+                        document.getElementById("step-email").classList.add("hidden");
+                        document.getElementById("step-reset").classList.remove("hidden"); // Hien step 2
+                        alertBox.classList.add("hidden");
+                    }, 1500);
+                } else {
+                    alertBox.className = "p-4 rounded-xl text-xs font-semibold bg-rose-100 text-rose-700 block";
+                    alertBox.innerText = data.message || "Gửi mã OTP thất bại.";
+                }
+            } catch (e) {
+                console.error("Request OTP error:", e);
+                alertBox.className = "p-4 rounded-xl text-xs font-semibold bg-rose-100 text-rose-700 block";
+                alertBox.innerText = "Lỗi kết nối đến máy chủ. Vui lòng thử lại.";
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        async function resetPassword() {
+            const email = document.getElementById("forgot-email").value.trim();
+            const otpCode = document.getElementById("forgot-otp").value.trim();
+            const newPassword = document.getElementById("forgot-new-password").value.trim();
+            const confirmPassword = document.getElementById("forgot-confirm-password").value.trim();
+            const alertBox = document.getElementById("forgot-alert-box");
+            const btn = document.getElementById("btn-reset-password");
+
+            if (!otpCode || !newPassword || !confirmPassword) {
+                alertBox.className = "p-4 rounded-xl text-xs font-semibold bg-rose-100 text-rose-700 block";
+                alertBox.innerText = "Vui lòng nhập đầy đủ các trường.";
+                alertBox.classList.remove("hidden");
+                return;
+            }
+
+            if (newPassword !== confirmPassword) {
+                alertBox.className = "p-4 rounded-xl text-xs font-semibold bg-rose-100 text-rose-700 block";
+                alertBox.innerText = "Mật khẩu xác nhận không trùng khớp.";
+                alertBox.classList.remove("hidden");
+                return;
+            }
+
+            alertBox.className = "p-4 rounded-xl text-xs font-semibold bg-blue-100 text-blue-700 block";
+            alertBox.innerText = "Đang xác thực và đổi mật khẩu...";
+            alertBox.classList.remove("hidden");
+            btn.disabled = true;
+
+            try {
+                const res = await apiFetch("AuthApi/reset-password-otp", {
+                    method: "POST",
+                    body: { email, otpCode, newPassword }
+                });
+                const data = await res.json();
+
+                if (res.ok) {
+                    alertBox.className = "p-4 rounded-xl text-xs font-semibold bg-green-100 text-green-700 block";
+                    alertBox.innerText = data.message || "Đổi mật khẩu thành công!";
+                    setTimeout(() => {
+                        toggleForgotPasswordModal(false);
+                        // Hien thong bao o form login chinh
+                        const mainAlert = document.getElementById("alert-box");
+                        mainAlert.className = "p-4 rounded-xl text-xs font-semibold bg-green-100 text-green-700 block";
+                        mainAlert.innerText = "Đổi mật khẩu thành công! Hãy đăng nhập lại.";
+                    }, 2000);
+                } else {
+                    alertBox.className = "p-4 rounded-xl text-xs font-semibold bg-rose-100 text-rose-700 block";
+                    alertBox.innerText = data.message || "Xác thực OTP thất bại.";
+                }
+            } catch (e) {
+                console.error("Reset password error:", e);
+                alertBox.className = "p-4 rounded-xl text-xs font-semibold bg-rose-100 text-rose-700 block";
+                alertBox.innerText = "Lỗi kết nối đến máy chủ. Vui lòng thử lại.";
+            } finally {
+                btn.disabled = false;
+            }
+        }
     </script>
+
+    <!-- Forgot Password Modal -->
+    <div id="forgot-password-modal" class="fixed inset-0 z-50 items-center justify-center bg-black/50 backdrop-blur-sm hidden">
+        <div class="bg-white border border-gray-150 rounded-3xl p-6 sm:p-10 shadow-2xl w-full max-w-md mx-4 space-y-6 relative transition-transform duration-300 scale-100">
+            <button onclick="toggleForgotPasswordModal(false)" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+            <div class="text-center space-y-2">
+                <h2 class="text-xl font-black text-gray-900 tracking-tight">Quên Mật Khẩu</h2>
+                <p class="text-xs text-gray-400">Nhập email của bạn để nhận mã xác thực OTP 6 số</p>
+            </div>
+
+            <div id="forgot-alert-box" class="hidden p-4 rounded-xl text-xs font-semibold"></div>
+
+            <!-- Bước 1: Nhập Email -->
+            <div id="step-email" class="space-y-4">
+                <div>
+                    <label class="block text-xxs font-bold text-gray-500 uppercase tracking-wider mb-2">Địa chỉ Email:</label>
+                    <input type="email" id="forgot-email" placeholder="example@email.com" class="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-gray-50/50">
+                </div>
+                <button onclick="requestOtp()" id="btn-request-otp" class="w-full py-3.5 bg-indigo-600 hover:bg-indigo-750 text-white rounded-full text-xs font-bold transition shadow-lg shadow-indigo-500/10">Gửi Mã Xác Thực</button>
+            </div>
+
+            <!-- Bước 2: Nhập OTP và Mật khẩu mới (ban đầu ẩn) -->
+            <div id="step-reset" class="space-y-4 hidden">
+                <div>
+                    <label class="block text-xxs font-bold text-gray-500 uppercase tracking-wider mb-2">Mã xác thực OTP (6 số):</label>
+                    <input type="text" id="forgot-otp" placeholder="123456" maxlength="6" class="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-xs text-center font-bold tracking-widest focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-gray-50/50">
+                </div>
+                <div>
+                    <label class="block text-xxs font-bold text-gray-500 uppercase tracking-wider mb-2">Mật khẩu mới:</label>
+                    <input type="password" id="forgot-new-password" placeholder="••••••" class="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-gray-50/50">
+                </div>
+                <div>
+                    <label class="block text-xxs font-bold text-gray-500 uppercase tracking-wider mb-2">Nhập lại mật khẩu mới:</label>
+                    <input type="password" id="forgot-confirm-password" placeholder="••••••" class="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-gray-50/50">
+                </div>
+                <button onclick="resetPassword()" id="btn-reset-password" class="w-full py-3.5 bg-green-600 hover:bg-green-700 text-white rounded-full text-xs font-bold transition shadow-lg shadow-green-500/10">Xác Nhận Đổi Mật Khẩu</button>
+                <button onclick="backToStepEmail()" class="w-full py-2.5 text-gray-500 hover:text-gray-700 text-xxs font-bold text-center block">Nhập lại Email</button>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

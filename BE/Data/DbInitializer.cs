@@ -33,7 +33,7 @@ namespace ClothingShop.Infrastructure.Data
                 // Bo qua loi
             }
 
-            // Tu dong cap nhat cot AvatarUrl trong SQL Server hoac Postgres neu chua co
+            // Tu dong cap nhat cot AvatarUrl, OtpCode, OtpExpiry trong SQL Server hoac Postgres neu chua co
             try
             {
                 if (context.Database.IsSqlServer())
@@ -43,6 +43,14 @@ namespace ClothingShop.Infrastructure.Data
                         BEGIN
                             ALTER TABLE dbo.AspNetUsers ADD AvatarUrl NVARCHAR(500) NULL;
                         END
+                        IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('dbo.AspNetUsers') AND name = 'OtpCode')
+                        BEGIN
+                            ALTER TABLE dbo.AspNetUsers ADD OtpCode NVARCHAR(50) NULL;
+                        END
+                        IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('dbo.AspNetUsers') AND name = 'OtpExpiry')
+                        BEGIN
+                            ALTER TABLE dbo.AspNetUsers ADD OtpExpiry DATETIME NULL;
+                        END
                     ");
                 }
                 else
@@ -50,6 +58,8 @@ namespace ClothingShop.Infrastructure.Data
                     // Neon PostgreSQL (Postgres 9.6+ ho tro ADD COLUMN IF NOT EXISTS)
                     await context.Database.ExecuteSqlRawAsync(@"
                         ALTER TABLE ""AspNetUsers"" ADD COLUMN IF NOT EXISTS ""AvatarUrl"" text NULL;
+                        ALTER TABLE ""AspNetUsers"" ADD COLUMN IF NOT EXISTS ""OtpCode"" text NULL;
+                        ALTER TABLE ""AspNetUsers"" ADD COLUMN IF NOT EXISTS ""OtpExpiry"" timestamp without time zone NULL;
                     ");
                 }
             }

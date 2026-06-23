@@ -105,6 +105,7 @@ builder.Services.AddScoped<CartService>();
 builder.Services.AddScoped<OrderService>();
 builder.Services.AddScoped<VoucherService>();
 builder.Services.AddScoped<ChatService>();
+builder.Services.AddScoped<EmailService>();
 
 // 8. Configure Controllers
 builder.Services.AddControllers()

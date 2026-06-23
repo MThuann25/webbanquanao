@@ -12,6 +12,9 @@ namespace ClothingShop.Domain.Entities
         public string? AvatarUrl { get; set; }
         public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
 
+        public string? OtpCode { get; set; }
+        public DateTime? OtpExpiry { get; set; }
+
         // Navigation properties
         public virtual ICollection<Cart> Carts { get; set; } = new List<Cart>();
         public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
