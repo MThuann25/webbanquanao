@@ -194,31 +194,77 @@ namespace ClothingShop.Web.Controllers
                 return Unauthorized(new { message = "Bạn cần đăng nhập để gửi đánh giá." });
             }
 
-            // Kiểm tra đã mua hàng chưa (phải có đơn Hoàn thành)
-            var hasPurchased = _unitOfWork.Repository<Order>().GetQueryable()
-                .Where(o => o.UserId == userId && o.Status == "Hoàn thành")
-                .Include(o => o.OrderDetails)
-                    .ThenInclude(od => od.ProductVariant)
-                .Any(o => o.OrderDetails.Any(od => od.ProductVariant.ProductId == id));
+            int? finalOrderId = null;
 
-            if (!hasPurchased)
+            if (model.OrderId.HasValue)
             {
-                return BadRequest(new { message = "Bạn chỉ có thể đánh giá sản phẩm sau khi đã mua và nhận hàng thành công." });
+                // Kiểm tra đơn hàng được chỉ định
+                var order = await _unitOfWork.Repository<Order>().GetQueryable()
+                    .Include(o => o.OrderDetails)
+                        .ThenInclude(od => od.ProductVariant)
+                    .FirstOrDefaultAsync(o => o.Id == model.OrderId.Value && o.UserId == userId && o.Status == "Hoàn thành");
+
+                if (order == null)
+                {
+                    return BadRequest(new { message = "Đơn hàng này không hợp lệ hoặc chưa được hoàn thành." });
+                }
+
+                var hasProduct = order.OrderDetails.Any(od => od.ProductVariant != null && od.ProductVariant.ProductId == id);
+                if (!hasProduct)
+                {
+                    return BadRequest(new { message = "Đơn hàng này không chứa sản phẩm mà bạn đang đánh giá." });
+                }
+
+                // Kiểm tra xem sản phẩm này trong đơn hàng này đã được đánh giá chưa
+                var hasReviewed = await _unitOfWork.Repository<Review>().GetQueryable()
+                    .AnyAsync(r => r.ProductId == id && r.OrderId == model.OrderId.Value && r.UserId == userId);
+
+                if (hasReviewed)
+                {
+                    return BadRequest(new { message = "Bạn đã đánh giá sản phẩm này cho đơn hàng này rồi." });
+                }
+
+                finalOrderId = model.OrderId.Value;
             }
-
-            // Kiểm tra đã đánh giá chưa
-            var existingReview = _unitOfWork.Repository<Review>().GetQueryable()
-                .FirstOrDefault(r => r.ProductId == id && r.UserId == userId);
-
-            if (existingReview != null)
+            else
             {
-                return BadRequest(new { message = "Bạn đã đánh giá sản phẩm này rồi." });
+                // Tương thích ngược: Tìm đơn hàng "Hoàn thành" gần nhất chứa sản phẩm này mà chưa được đánh giá
+                var orders = await _unitOfWork.Repository<Order>().GetQueryable()
+                    .Where(o => o.UserId == userId && o.Status == "Hoàn thành")
+                    .Include(o => o.OrderDetails)
+                        .ThenInclude(od => od.ProductVariant)
+                    .OrderByDescending(o => o.OrderDate)
+                    .ToListAsync();
+
+                Order targetOrder = null;
+                foreach (var o in orders)
+                {
+                    var hasProd = o.OrderDetails.Any(od => od.ProductVariant != null && od.ProductVariant.ProductId == id);
+                    if (hasProd)
+                    {
+                        var isReviewed = await _unitOfWork.Repository<Review>().GetQueryable()
+                            .AnyAsync(r => r.ProductId == id && r.OrderId == o.Id && r.UserId == userId);
+                        if (!isReviewed)
+                        {
+                            targetOrder = o;
+                            break;
+                        }
+                    }
+                }
+
+                if (targetOrder == null)
+                {
+                    return BadRequest(new { message = "Bạn cần mua và hoàn thành đơn hàng trước khi đánh giá sản phẩm này, hoặc bạn đã đánh giá sản phẩm này rồi." });
+                }
+
+                finalOrderId = targetOrder.Id;
             }
 
             var review = new Review
             {
                 ProductId = id,
                 UserId = userId,
+                OrderId = finalOrderId,
                 Rating = model.Rating,
                 Comment = model.Comment ?? "",
                 CreatedDate = DateTime.UtcNow,
@@ -236,5 +282,6 @@ namespace ClothingShop.Web.Controllers
     {
         public int Rating { get; set; }
         public string? Comment { get; set; }
+        public int? OrderId { get; set; }
     }
 }

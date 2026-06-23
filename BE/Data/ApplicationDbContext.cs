@@ -141,6 +141,12 @@ namespace ClothingShop.Infrastructure.Data
                 .HasForeignKey(r => r.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
 
+            builder.Entity<Review>()
+                .HasOne(r => r.Order)
+                .WithMany()
+                .HasForeignKey(r => r.OrderId)
+                .OnDelete(DeleteBehavior.SetNull);
+
             builder.Entity<ChatLog>()
                 .HasOne(cl => cl.User)
                 .WithMany()

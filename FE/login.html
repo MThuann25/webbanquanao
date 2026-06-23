@@ -50,7 +50,12 @@
                         <label class="block text-xxs font-bold text-gray-500 uppercase tracking-wider">Mật khẩu:</label>
                         <a href="javascript:void(0)" onclick="toggleForgotPasswordModal(true)" class="text-xxs text-indigo-650 font-bold hover:underline">Quên mật khẩu?</a>
                     </div>
-                    <input type="password" id="login-password" placeholder="••••••" class="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-gray-50/50" required>
+                    <div class="relative">
+                        <input type="password" id="login-password" placeholder="••••••" class="w-full pl-4 pr-10 py-2.5 border border-gray-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-gray-50/50" required>
+                        <button type="button" onclick="togglePasswordVisibility('login-password', this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-indigo-600 focus:outline-none">
+                            <i class="fa-solid fa-eye text-xs"></i>
+                        </button>
+                    </div>
                 </div>
                 <div class="flex items-center">
                     <input type="checkbox" id="login-remember" class="h-4 w-4 text-indigo-650 focus:ring-indigo-500 border-gray-300 rounded">
@@ -82,6 +87,20 @@
     <script>
         let returnUrl = "profile.html";
 
+        function togglePasswordVisibility(inputId, btn) {
+            const input = document.getElementById(inputId);
+            const icon = btn.querySelector("i");
+            if (input.type === "password") {
+                input.type = "text";
+                icon.classList.remove("fa-eye");
+                icon.classList.add("fa-eye-slash");
+            } else {
+                input.type = "password";
+                icon.classList.remove("fa-eye-slash");
+                icon.classList.add("fa-eye");
+            }
+        }
+
         document.addEventListener("DOMContentLoaded", () => {
             const params = new URLSearchParams(window.location.search);
             if (params.has("returnUrl")) returnUrl = params.get("returnUrl");
@@ -112,8 +131,10 @@
                     localStorage.setItem("user", JSON.stringify(data.user));
                     box.className = "p-4 rounded-xl text-xs font-semibold bg-green-100 text-green-700 block";
                     box.innerText = "Đăng nhập thành công! Đang chuyển hướng...";
+                    
+                    const isAdmin = data.user && data.user.roles && data.user.roles.includes("Admin");
                     setTimeout(() => {
-                        window.location.href = returnUrl;
+                        window.location.href = isAdmin ? "admin.html" : returnUrl;
                     }, 800);
                 } else {
                     box.className = "p-4 rounded-xl text-xs font-semibold bg-rose-100 text-rose-700 block";
@@ -286,11 +307,21 @@
                 </div>
                 <div>
                     <label class="block text-xxs font-bold text-gray-500 uppercase tracking-wider mb-2">Mật khẩu mới:</label>
-                    <input type="password" id="forgot-new-password" placeholder="••••••" class="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-gray-50/50">
+                    <div class="relative">
+                        <input type="password" id="forgot-new-password" placeholder="••••••" class="w-full pl-4 pr-10 py-2.5 border border-gray-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-gray-50/50">
+                        <button type="button" onclick="togglePasswordVisibility('forgot-new-password', this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-indigo-600 focus:outline-none">
+                            <i class="fa-solid fa-eye text-xs"></i>
+                        </button>
+                    </div>
                 </div>
                 <div>
                     <label class="block text-xxs font-bold text-gray-500 uppercase tracking-wider mb-2">Nhập lại mật khẩu mới:</label>
-                    <input type="password" id="forgot-confirm-password" placeholder="••••••" class="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-gray-50/50">
+                    <div class="relative">
+                        <input type="password" id="forgot-confirm-password" placeholder="••••••" class="w-full pl-4 pr-10 py-2.5 border border-gray-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-gray-50/50">
+                        <button type="button" onclick="togglePasswordVisibility('forgot-confirm-password', this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-indigo-600 focus:outline-none">
+                            <i class="fa-solid fa-eye text-xs"></i>
+                        </button>
+                    </div>
                 </div>
                 <button onclick="resetPassword()" id="btn-reset-password" class="w-full py-3.5 bg-green-600 hover:bg-green-700 text-white rounded-full text-xs font-bold transition shadow-lg shadow-green-500/10">Xác Nhận Đổi Mật Khẩu</button>
                 <button onclick="backToStepEmail()" class="w-full py-2.5 text-gray-500 hover:text-gray-700 text-xxs font-bold text-center block">Nhập lại Email</button>

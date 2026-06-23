@@ -68,6 +68,43 @@ namespace ClothingShop.Infrastructure.Data
                 // Bo qua loi
             }
 
+            // Tu dong cap nhat cot OrderId trong Reviews neu chua co
+            try
+            {
+                if (context.Database.IsSqlServer())
+                {
+                    await context.Database.ExecuteSqlRawAsync(@"
+                        IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('dbo.Reviews') AND name = 'OrderId')
+                        BEGIN
+                            ALTER TABLE dbo.Reviews ADD OrderId INT NULL;
+                            ALTER TABLE dbo.Reviews ADD CONSTRAINT FK_Reviews_Orders_OrderId FOREIGN KEY (OrderId) REFERENCES dbo.Orders(Id) ON DELETE SET NULL;
+                        END
+                    ");
+                }
+                else
+                {
+                    // Neon PostgreSQL
+                    await context.Database.ExecuteSqlRawAsync(@"
+                        ALTER TABLE ""Reviews"" ADD COLUMN IF NOT EXISTS ""OrderId"" integer NULL;
+                        
+                        DO $$
+                        BEGIN
+                            IF NOT EXISTS (
+                                SELECT 1 FROM pg_constraint WHERE conname = 'FK_Reviews_Orders_OrderId'
+                            ) THEN
+                                ALTER TABLE ""Reviews"" 
+                                ADD CONSTRAINT ""FK_Reviews_Orders_OrderId"" 
+                                FOREIGN KEY (""OrderId"") REFERENCES ""Orders"" (""Id"") ON DELETE SET NULL;
+                            END IF;
+                        END $$;
+                    ");
+                }
+            }
+            catch (Exception)
+            {
+                // Bo qua loi
+            }
+
             // Create ProductTypes table and ProductTypeId column if they don't exist
             try
             {
