@@ -24,17 +24,20 @@ namespace ClothingShop.Web.Controllers
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly CartService _cartService;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly EmailService _emailService;
 
         public AuthApiController(
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
             CartService cartService,
-            IUnitOfWork unitOfWork)
+            IUnitOfWork unitOfWork,
+            EmailService emailService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _cartService = cartService;
             _unitOfWork = unitOfWork;
+            _emailService = emailService;
         }
 
         [HttpPost("login")]
@@ -436,6 +439,105 @@ namespace ClothingShop.Web.Controllers
 
             return Ok(new { url = url, message = "Tải ảnh đại diện lên thành công!" });
         }
+
+        [HttpPost("forgot-password")]
+        [AllowAnonymous]
+        public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequestDto model)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            var user = await _userManager.FindByEmailAsync(model.Email);
+            if (user == null)
+            {
+                return BadRequest(new { message = "Email không tồn tại trong hệ thống." });
+            }
+
+            // Sinh mã OTP 6 số
+            var otpCode = new Random().Next(100000, 999999).ToString();
+            user.OtpCode = otpCode;
+            user.OtpExpiry = DateTime.UtcNow.AddMinutes(5); // OTP có hiệu lực trong 5 phút
+
+            var result = await _userManager.UpdateAsync(user);
+            if (!result.Succeeded)
+            {
+                return BadRequest(new { message = "Không thể tạo mã xác thực." });
+            }
+
+            // Gửi email
+            var emailBody = $@"
+                <div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 5px;'>
+                    <h2 style='color: #4F46E5; text-align: center;'>Yêu Cầu Đổi Mật Khẩu</h2>
+                    <p>Chào bạn,</p>
+                    <p>Chúng tôi nhận được yêu cầu thay đổi mật khẩu cho tài khoản của bạn. Vui lòng sử dụng mã OTP dưới đây để hoàn tất quá trình:</p>
+                    <div style='text-align: center; margin: 30px 0;'>
+                        <span style='font-size: 32px; font-weight: bold; letter-spacing: 5px; color: #1E293B; background: #F1F5F9; padding: 10px 20px; border-radius: 5px;'>{otpCode}</span>
+                    </div>
+                    <p style='color: #6B7280; font-size: 14px;'>Mã xác nhận này sẽ hết hạn sau <b>5 phút</b>.</p>
+                    <p style='color: #6B7280; font-size: 14px;'>Nếu bạn không yêu cầu đổi mật khẩu, vui lòng bỏ qua email này.</p>
+                    <hr style='border: none; border-top: 1px solid #eee; margin: 20px 0;' />
+                    <p style='text-align: center; color: #9CA3AF; font-size: 12px;'>Hệ thống cửa hàng thời trang Clothing Shop</p>
+                </div>";
+
+            var sendResult = await _emailService.SendEmailAsync(user.Email!, "Mã xác thực OTP đổi mật khẩu", emailBody);
+            if (!sendResult)
+            {
+                return BadRequest(new { message = "Lỗi khi gửi email xác thực." });
+            }
+
+            return Ok(new { message = "Mã OTP đã được gửi về email của bạn (vui lòng kiểm tra hộp thư hoặc mục spam)." });
+        }
+
+        [HttpPost("reset-password-otp")]
+        [AllowAnonymous]
+        public async Task<IActionResult> ResetPasswordOtp([FromBody] ResetPasswordOtpDto model)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            var user = await _userManager.FindByEmailAsync(model.Email);
+            if (user == null)
+            {
+                return BadRequest(new { message = "Email không tồn tại trong hệ thống." });
+            }
+
+            if (string.IsNullOrEmpty(user.OtpCode) || user.OtpCode != model.OtpCode)
+            {
+                return BadRequest(new { message = "Mã OTP không hợp lệ." });
+            }
+
+            if (!user.OtpExpiry.HasValue || user.OtpExpiry.Value < DateTime.UtcNow)
+            {
+                return BadRequest(new { message = "Mã OTP đã hết hạn." });
+            }
+
+            // Xoá OTP sau khi xác nhận thành công
+            user.OtpCode = null;
+            user.OtpExpiry = null;
+            await _userManager.UpdateAsync(user);
+
+            // Đổi mật khẩu
+            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+            var result = await _userManager.ResetPasswordAsync(user, token, model.NewPassword);
+
+            if (result.Succeeded)
+            {
+                return Ok(new { message = "Đổi mật khẩu thành công! Bạn có thể đăng nhập bằng mật khẩu mới." });
+            }
+
+            var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+            return BadRequest(new { message = $"Không thể đổi mật khẩu: {errors}" });
+        }
+    }
+
+    public class ForgotPasswordRequestDto
+    {
+        public string Email { get; set; } = null!;
+    }
+
+    public class ResetPasswordOtpDto
+    {
+        public string Email { get; set; } = null!;
+        public string OtpCode { get; set; } = null!;
+        public string NewPassword { get; set; } = null!;
     }
 
     public class RedeemVoucherDto
