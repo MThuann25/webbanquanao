@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
@@ -31,90 +31,294 @@
 <body class="bg-gray-50 text-gray-900 font-sans flex flex-col min-h-screen">
 
     <!-- Hero Section -->
-    <section class="relative bg-gradient-to-br from-indigo-900 via-slate-900 to-indigo-950 text-white overflow-hidden py-24 sm:py-32">
-        <div class="absolute inset-0 opacity-10 bg-[radial-gradient(#4f46e5_1px,transparent_1px)] [background-size:16px_16px]"></div>
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-                <div class="space-y-6 text-center lg:text-left">
-                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">BST HÈ 2026</span>
-                    <h1 class="text-4xl sm:text-6xl font-black tracking-tight leading-none text-white">Định hình<br><span class="bg-gradient-to-r from-indigo-400 to-violet-400 bg-clip-text text-transparent">Phong Cách Riêng</span></h1>
-                    <p class="text-base sm:text-lg text-gray-300 max-w-lg mx-auto lg:mx-0">Khám phá các bộ sưu tập mới nhất với chất liệu thoáng mát, phom dáng hiện đại giúp bạn tự tin tỏa sáng mọi lúc mọi nơi.</p>
-                    <div class="flex flex-col sm:flex-row justify-center lg:justify-start gap-4">
-                        <a href="shop.html" class="bg-indigo-600 hover:bg-indigo-750 text-white px-8 py-3 rounded-full text-sm font-bold transition shadow-lg shadow-indigo-500/20 flex items-center justify-center space-x-2">
-                            <span>Mua Sắm Ngay</span>
-                            <i class="fa-solid fa-arrow-right"></i>
-                        </a>
-                        <a href="#categories" class="border border-white/20 hover:bg-white/10 text-white px-8 py-3 rounded-full text-sm font-semibold transition flex items-center justify-center">Tìm hiểu thêm</a>
-                    </div>
+    <section class="w-full bg-white relative overflow-hidden" id="hero-carousel">
+        <div class="flex transition-transform duration-1000 ease-in-out" id="hero-slider">
+            <!-- Slide 1 -->
+            <div class="w-full flex-shrink-0 relative">
+                <img src="assets/home/hero_banner_1782236805561.png" alt="Back In Form" class="w-full h-[600px] object-cover">
+                <div class="absolute inset-0 flex flex-col items-center justify-center text-center">
+                    <h1 class="text-5xl md:text-7xl font-serif italic font-black text-gray-900 tracking-tight leading-none mb-2">Back<br><span class="text-6xl md:text-8xl not-italic font-black uppercase tracking-tighter">IN FORM</span></h1>
+                    <p class="text-xs md:text-sm font-semibold text-gray-700 tracking-widest uppercase mb-10 bg-white/50 backdrop-blur-sm px-4 py-1">NOT JUST BACK TO WORK - BACK WITH PRESENCE</p>
+                    <a href="shop.html" class="text-xs md:text-sm font-bold text-gray-900 bg-white/80 px-4 py-2 tracking-widest uppercase hover:bg-black hover:text-white transition">LOOKBOOK FOR MEN 26</a>
                 </div>
-                <div class="relative hidden lg:block">
-                    <div class="absolute -inset-1 rounded-3xl bg-gradient-to-r from-indigo-500 to-violet-500 opacity-30 blur-2xl animate-pulse"></div>
-                    <img src="https://images.unsplash.com/photo-1483985988355-763728e1935b?w=600&auto=format&fit=crop&q=60" alt="BST Mới" class="relative rounded-3xl w-full h-[400px] object-cover shadow-2xl">
+            </div>
+            <!-- Slide 2 -->
+            <div class="w-full flex-shrink-0 relative">
+                <img src="assets/home/banner_2_1782237096159.png" alt="Office Style" class="w-full h-[600px] object-cover">
+                <div class="absolute inset-0 flex flex-col items-center justify-center text-center">
+                    <h1 class="text-5xl md:text-7xl font-serif italic font-black text-gray-100 tracking-tight leading-none mb-2 drop-shadow-lg">Modern<br><span class="text-6xl md:text-8xl not-italic font-black uppercase tracking-tighter drop-shadow-xl text-white">GENTLEMAN</span></h1>
+                    <p class="text-xs md:text-sm font-semibold text-gray-200 tracking-widest uppercase mb-10 drop-shadow-md">ELEVATE YOUR EVERYDAY STYLE</p>
+                    <a href="shop.html" class="text-xs md:text-sm font-bold text-white bg-black/50 backdrop-blur-md px-6 py-3 tracking-widest uppercase hover:bg-white hover:text-black transition">MUA SẮM NGAY</a>
+                </div>
+            </div>
+            <!-- Slide 3 -->
+            <div class="w-full flex-shrink-0 relative">
+                <img src="assets/home/banner_3_1782237107141.png" alt="Casual Smart" class="w-full h-[600px] object-cover">
+                <div class="absolute inset-0 flex flex-col items-center justify-center text-center">
+                    <h1 class="text-5xl md:text-7xl font-serif italic font-black text-white tracking-tight leading-none mb-2 drop-shadow-lg">Smart<br><span class="text-6xl md:text-8xl not-italic font-black uppercase tracking-tighter drop-shadow-xl">CASUAL</span></h1>
+                    <p class="text-xs md:text-sm font-semibold text-gray-200 tracking-widest uppercase mb-10 drop-shadow-md bg-black/20 px-4 py-1">COMFORT MEETS PROFESSIONAL</p>
+                    <a href="shop.html" class="text-xs md:text-sm font-bold text-white border border-white px-6 py-3 tracking-widest uppercase hover:bg-white hover:text-black transition">KHÁM PHÁ</a>
                 </div>
             </div>
         </div>
+        
+        <!-- Navigation Dots -->
+        <div class="absolute bottom-6 left-0 right-0 flex justify-center space-x-3 z-10" id="hero-dots">
+            <button class="w-2.5 h-2.5 rounded-full bg-red-600 transition-all"></button>
+            <button class="w-2.5 h-2.5 rounded-full bg-white/50 hover:bg-white transition-all"></button>
+            <button class="w-2.5 h-2.5 rounded-full bg-white/50 hover:bg-white transition-all"></button>
+        </div>
+        
+        <!-- Arrow Buttons -->
+        <button id="hero-prev" class="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/30 backdrop-blur-md text-white rounded-full flex items-center justify-center hover:bg-white hover:text-black transition opacity-0 group-hover:opacity-100 hidden md:flex">
+            <i class="fa-solid fa-chevron-left"></i>
+        </button>
+        <button id="hero-next" class="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/30 backdrop-blur-md text-white rounded-full flex items-center justify-center hover:bg-white hover:text-black transition opacity-0 group-hover:opacity-100 hidden md:flex">
+            <i class="fa-solid fa-chevron-right"></i>
+        </button>
     </section>
 
     <!-- Categories Section -->
     <section id="categories" class="py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center max-w-xl mx-auto mb-12">
-            <h2 class="text-3xl font-black text-gray-900 tracking-tight">Mua Theo Danh Mục</h2>
-            <p class="text-sm text-gray-500 mt-2">Dễ dàng lựa chọn sản phẩm phù hợp cho nhu cầu của bạn</p>
+        <div class="flex justify-between items-end mb-8">
+            <h2 class="text-2xl md:text-3xl font-black text-gray-900 uppercase tracking-tight">DANH MỤC SẢN PHẨM</h2>
+            <div class="flex space-x-4">
+                <button class="text-gray-400 hover:text-gray-900 transition"><i class="fa-solid fa-arrow-left"></i></button>
+                <button class="text-gray-900 hover:text-gray-600 transition"><i class="fa-solid fa-arrow-right"></i></button>
+            </div>
         </div>
-        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6">
-            <a href="shop.html?categoryId=1" class="group bg-white rounded-2xl p-6 text-center border border-gray-100 hover:border-indigo-200 hover:shadow-xl hover:shadow-indigo-500/5 transition duration-300">
-                <div class="w-16 h-16 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition duration-300">
-                    <i class="fa-solid fa-shirt text-2xl"></i>
+        
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-6">
+            <!-- Sơ mi -->
+            <a href="shop.html?categoryName=Áo Nam&productTypeName=Sơ mi" class="group relative overflow-hidden bg-gray-100 aspect-[3/4]">
+                <img src="assets/home/cat_somi.png" alt="Sơ mi" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                <div class="absolute bottom-0 left-0 right-0">
+                    <div class="bg-white/80 backdrop-blur-sm px-4 py-3 flex justify-between items-center group-hover:bg-white transition duration-300">
+                        <span class="font-semibold text-gray-900">Sơ mi</span>
+                        <div class="w-6 h-6 rounded-full bg-white flex items-center justify-center text-gray-900 shadow-sm">
+                            <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                        </div>
+                    </div>
                 </div>
-                <h3 class="font-bold text-sm text-gray-800">Áo Nam</h3>
             </a>
-            <a href="shop.html?categoryId=2" class="group bg-white rounded-2xl p-6 text-center border border-gray-100 hover:border-indigo-200 hover:shadow-xl hover:shadow-indigo-500/5 transition duration-300">
-                <div class="w-16 h-16 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition duration-300">
-                    <i class="fa-solid fa-lines-leaning text-2xl"></i>
+            
+            <!-- Áo thun -->
+            <a href="shop.html?categoryName=Áo Nam&productTypeName=Áo thun" class="group relative overflow-hidden bg-gray-100 aspect-[3/4]">
+                <img src="assets/home/cat_tshirt_1782236831988.png" alt="Áo thun" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                <div class="absolute bottom-0 left-0 right-0">
+                    <div class="bg-white/80 backdrop-blur-sm px-4 py-3 flex justify-between items-center group-hover:bg-white transition duration-300">
+                        <span class="font-semibold text-gray-900">Áo thun</span>
+                        <div class="w-6 h-6 rounded-full bg-white flex items-center justify-center text-gray-900 shadow-sm">
+                            <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                        </div>
+                    </div>
                 </div>
-                <h3 class="font-bold text-sm text-gray-800">Quần Nam</h3>
             </a>
-            <a href="shop.html?categoryId=3" class="group bg-white rounded-2xl p-6 text-center border border-gray-100 hover:border-indigo-200 hover:shadow-xl hover:shadow-indigo-500/5 transition duration-300">
-                <div class="w-16 h-16 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition duration-300">
-                    <i class="fa-solid fa-person-dress text-2xl"></i>
+            
+            <!-- Quần Short -->
+            <a href="shop.html?categoryName=Quần Nam&productTypeName=Quần short" class="group relative overflow-hidden bg-gray-100 aspect-[3/4]">
+                <img src="assets/home/cat_quanshort_1782236851721.png" alt="Quần Short" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                <div class="absolute bottom-0 left-0 right-0">
+                    <div class="bg-white/80 backdrop-blur-sm px-4 py-3 flex justify-between items-center group-hover:bg-white transition duration-300">
+                        <span class="font-semibold text-gray-900">Quần Short</span>
+                        <div class="w-6 h-6 rounded-full bg-white flex items-center justify-center text-gray-900 shadow-sm">
+                            <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                        </div>
+                    </div>
                 </div>
-                <h3 class="font-bold text-sm text-gray-800">Áo Nữ</h3>
             </a>
-            <a href="shop.html?categoryId=4" class="group bg-white rounded-2xl p-6 text-center border border-gray-100 hover:border-indigo-200 hover:shadow-xl hover:shadow-indigo-500/5 transition duration-300">
-                <div class="w-16 h-16 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition duration-300">
-                    <i class="fa-solid fa-person-dress-burst text-2xl"></i>
+            
+            <!-- Quần Âu -->
+            <a href="shop.html?categoryName=Quần Nam&productTypeName=Quần Âu" class="group relative overflow-hidden bg-gray-100 aspect-[3/4]">
+                <img src="assets/home/cat_quanau_1782236861097.png" alt="Quần Âu" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                <div class="absolute bottom-0 left-0 right-0">
+                    <div class="bg-white/80 backdrop-blur-sm px-4 py-3 flex justify-between items-center group-hover:bg-white transition duration-300">
+                        <span class="font-semibold text-gray-900">Quần Âu</span>
+                        <div class="w-6 h-6 rounded-full bg-white flex items-center justify-center text-gray-900 shadow-sm">
+                            <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                        </div>
+                    </div>
                 </div>
-                <h3 class="font-bold text-sm text-gray-800">Váy Nữ</h3>
-            </a>
-            <a href="shop.html?categoryId=5" class="group bg-white rounded-2xl p-6 text-center border border-gray-100 hover:border-indigo-200 hover:shadow-xl hover:shadow-indigo-500/5 transition duration-300">
-                <div class="w-16 h-16 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition duration-300">
-                    <i class="fa-solid fa-gem text-2xl"></i>
-                </div>
-                <h3 class="font-bold text-sm text-gray-800">Phụ Kiện</h3>
             </a>
         </div>
     </section>
 
-    <!-- Hot Products Section -->
-    <section class="py-16 bg-gray-50 flex-1">
+    <!-- Discount Products Section -->
+    <section class="py-16 bg-[#fdf8f5] flex-1">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-end mb-10">
-                <div>
-                    <h2 class="text-3xl font-black text-gray-900 tracking-tight">Sản Phẩm Nổi Bật</h2>
-                    <p class="text-sm text-gray-500 mt-2">BST thời trang phong cách bán chạy nhất tuần qua</p>
+            <div class="flex justify-between items-end mb-8 border-b border-gray-200 pb-4">
+                <div class="flex items-center space-x-2">
+                    <div class="w-2 h-2 bg-red-600 rounded-full"></div>
+                    <h2 class="text-2xl md:text-3xl font-black text-gray-900 tracking-tight uppercase">SẢN PHẨM KHUYẾN MÃI</h2>
                 </div>
-                <a href="shop.html" class="text-indigo-600 hover:text-indigo-700 text-sm font-bold flex items-center space-x-1 transition">
-                    <span>Xem tất cả</span>
-                    <i class="fa-solid fa-chevron-right"></i>
-                </a>
+                <div class="flex space-x-4">
+                    <button class="text-gray-400 hover:text-gray-900 transition"><i class="fa-solid fa-arrow-left"></i></button>
+                    <button class="text-gray-900 hover:text-gray-600 transition"><i class="fa-solid fa-arrow-right"></i></button>
+                </div>
             </div>
             
-            <div id="featured-products" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div id="featured-products" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
                 <!-- Dynamic cards populated by script -->
                 <div class="col-span-full text-center py-12 text-gray-400">
                     <i class="fa-solid fa-spinner animate-spin text-3xl mb-3"></i>
-                    <p>Đang tải danh sách sản phẩm nổi bật...</p>
+                    <p>Đang tải danh sách sản phẩm...</p>
                 </div>
+            </div>
+            
+            <div class="mt-10 flex justify-center">
+                <a href="shop.html?isDiscount=true" class="border border-gray-800 text-gray-800 hover:bg-gray-800 hover:text-white px-8 py-3 text-sm font-bold uppercase transition bg-white">
+                    XEM TẤT CẢ SẢN PHẨM KHUYẾN MÃI
+                </a>
+            </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Collection Section -->
+    <section class="py-16 bg-white flex-1">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Static Banner -->
+            <div class="w-full mb-8 overflow-hidden rounded-md">
+                <img src="assets/home/hero_banner_1782236805561.png" alt="Bộ sưu tập mới" class="w-full h-auto max-h-[400px] object-cover hover:scale-105 transition duration-700">
+            </div>
+            
+            <!-- Products Grid -->
+            <div id="collection-products" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+                <div class="col-span-full text-center py-12 text-gray-400">
+                    <i class="fa-solid fa-spinner animate-spin text-3xl mb-3"></i>
+                    <p>Đang tải danh sách sản phẩm...</p>
+                </div>
+            </div>
+            
+            <!-- Button -->
+            <div class="mt-10 flex justify-center">
+                <a href="shop.html" class="border border-gray-800 text-gray-800 hover:bg-gray-800 hover:text-white px-8 py-3 text-sm font-bold uppercase transition bg-white">
+                    XEM TẤT CẢ BỘ SƯU TẬP
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tabbed Products Section -->
+    <section class="py-16 bg-white flex-1">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Tabs -->
+            <div class="flex flex-wrap justify-center gap-6 mb-10 border-b border-gray-200">
+                <button onclick="switchTab(this, 'featured')" class="tab-btn text-lg md:text-xl font-medium text-gray-900 border-b-2 border-gray-900 pb-3 px-2 uppercase tracking-wide">SẢN PHẨM NỔI BẬT</button>
+                <button onclick="switchTab(this, 'thudong')" class="tab-btn text-lg md:text-xl font-medium text-gray-400 hover:text-gray-600 border-b-2 border-transparent pb-3 px-2 uppercase tracking-wide transition">ĐỒ THU ĐÔNG</button>
+                <button onclick="switchTab(this, 'congso')" class="tab-btn text-lg md:text-xl font-medium text-gray-400 hover:text-gray-600 border-b-2 border-transparent pb-3 px-2 uppercase tracking-wide transition">ĐỒ CÔNG SỞ</button>
+                <button onclick="switchTab(this, 'thethao')" class="tab-btn text-lg md:text-xl font-medium text-gray-400 hover:text-gray-600 border-b-2 border-transparent pb-3 px-2 uppercase tracking-wide transition">ĐỒ THỂ THAO</button>
+            </div>
+            
+            <!-- Products Grid -->
+            <div id="tabbed-products" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6">
+                <!-- Dynamic cards populated by script -->
+                <div class="col-span-full text-center py-12 text-gray-400">
+                    <i class="fa-solid fa-spinner animate-spin text-3xl mb-3"></i>
+                    <p>Đang tải danh sách sản phẩm...</p>
+                </div>
+            </div>
+            
+            <!-- Button -->
+            <div class="mt-12 flex justify-center">
+                <a id="view-all-tabbed-btn" href="shop.html" class="border border-gray-800 text-gray-800 hover:bg-gray-800 hover:text-white px-8 py-3 text-sm font-bold uppercase transition bg-white">
+                    XEM TẤT CẢ SẢN PHẨM NỔI BẬT
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Outfit of the day Section -->
+    <section class="py-16 bg-[#fdf8f5] flex-1">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-2xl md:text-3xl font-black text-gray-900 tracking-tight uppercase mb-10 text-left">OUTFIT OF THE DAY</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Outfit 1 -->
+                <div class="flex flex-col">
+                    <div class="relative group aspect-[3/4] overflow-hidden bg-gray-100">
+                        <img src="assets/home/outfit_1_1782237741667.png" alt="Outfit đi làm" class="w-full h-full object-cover group-hover:scale-105 transition duration-700">
+                        
+                        <!-- Hotspot -->
+                        <div class="absolute top-[40%] left-[30%] group/hotspot">
+                            <button class="w-6 h-6 bg-white/90 rounded-full flex items-center justify-center text-gray-800 shadow-lg hover:scale-110 transition relative z-10">
+                                <i class="fa-solid fa-plus text-[10px]"></i>
+                            </button>
+                            <!-- Tooltip -->
+                            <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 bg-white shadow-xl p-2 w-48 rounded opacity-0 invisible group-hover/hotspot:opacity-100 group-hover/hotspot:visible transition-all z-20 flex space-x-2">
+                                <img src="assets/home/cat_polo_1782236818333.png" class="w-10 h-10 object-cover bg-gray-100">
+                                <div class="flex-1 flex flex-col justify-center">
+                                    <span class="text-[9px] font-bold text-gray-800 line-clamp-2 leading-tight">Áo polo trơn in logo ngực TRN...</span>
+                                    <span class="text-[10px] font-bold text-red-600 mt-0.5">499,000đ</span>
+                                </div>
+                                <div class="absolute -bottom-2 left-1/2 -translate-x-1/2 border-[6px] border-transparent border-t-white"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-4 text-left">
+                        <p class="text-xs text-gray-500 font-bold uppercase tracking-widest mb-2">OUTFIT ĐI LÀM</p>
+                        <a href="shop.html" class="inline-block border border-gray-800 text-gray-800 hover:bg-gray-800 hover:text-white px-5 py-2 text-[10px] font-bold uppercase transition bg-white">MUA FULLSET</a>
+                    </div>
+                </div>
+
+                <!-- Outfit 2 -->
+                <div class="flex flex-col">
+                    <div class="relative group aspect-[3/4] overflow-hidden bg-gray-100">
+                        <img src="assets/home/outfit_2_1782237764024.png" alt="Outfit đi chơi" class="w-full h-full object-cover group-hover:scale-105 transition duration-700">
+                        
+                        <!-- Hotspot -->
+                        <div class="absolute top-[50%] left-[60%] group/hotspot">
+                            <button class="w-6 h-6 bg-white/90 rounded-full flex items-center justify-center text-gray-800 shadow-lg hover:scale-110 transition relative z-10">
+                                <i class="fa-solid fa-plus text-[10px]"></i>
+                            </button>
+                            <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 bg-white shadow-xl p-2 w-48 rounded opacity-0 invisible group-hover/hotspot:opacity-100 group-hover/hotspot:visible transition-all z-20 flex space-x-2">
+                                <img src="assets/home/cat_quanshort_1782236851721.png" class="w-10 h-10 object-cover bg-gray-100">
+                                <div class="flex-1 flex flex-col justify-center">
+                                    <span class="text-[9px] font-bold text-gray-800 line-clamp-2 leading-tight">Quần jean nam co giãn...</span>
+                                    <span class="text-[10px] font-bold text-red-600 mt-0.5">599,000đ</span>
+                                </div>
+                                <div class="absolute -bottom-2 left-1/2 -translate-x-1/2 border-[6px] border-transparent border-t-white"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-4 text-left">
+                        <p class="text-xs text-gray-500 font-bold uppercase tracking-widest mb-2">OUTFIT ĐI CHƠI</p>
+                        <a href="shop.html" class="inline-block border border-gray-800 text-gray-800 hover:bg-gray-800 hover:text-white px-5 py-2 text-[10px] font-bold uppercase transition bg-white">MUA FULLSET</a>
+                    </div>
+                </div>
+
+                <!-- Outfit 3 -->
+                <div class="flex flex-col">
+                    <div class="relative group aspect-[3/4] overflow-hidden bg-gray-100">
+                        <img src="assets/home/outfit_3_1782237777014.png" alt="Outfit lịch lãm" class="w-full h-full object-cover group-hover:scale-105 transition duration-700">
+                        
+                        <!-- Hotspot -->
+                        <div class="absolute top-[45%] left-[50%] group/hotspot">
+                            <button class="w-6 h-6 bg-white/90 rounded-full flex items-center justify-center text-gray-800 shadow-lg hover:scale-110 transition relative z-10">
+                                <i class="fa-solid fa-plus text-[10px]"></i>
+                            </button>
+                            <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 bg-white shadow-xl p-2 w-48 rounded opacity-0 invisible group-hover/hotspot:opacity-100 group-hover/hotspot:visible transition-all z-20 flex space-x-2">
+                                <img src="assets/home/cat_quanau_1782236861097.png" class="w-10 h-10 object-cover bg-gray-100">
+                                <div class="flex-1 flex flex-col justify-center">
+                                    <span class="text-[9px] font-bold text-gray-800 line-clamp-2 leading-tight">Quần âu nam form slimfit...</span>
+                                    <span class="text-[10px] font-bold text-red-600 mt-0.5">450,000đ</span>
+                                </div>
+                                <div class="absolute -bottom-2 left-1/2 -translate-x-1/2 border-[6px] border-transparent border-t-white"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-4 text-left">
+                        <p class="text-xs text-gray-500 font-bold uppercase tracking-widest mb-2">OUTFIT LỊCH LÃM</p>
+                        <a href="shop.html" class="inline-block border border-gray-800 text-gray-800 hover:bg-gray-800 hover:text-white px-5 py-2 text-[10px] font-bold uppercase transition bg-white">MUA FULLSET</a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Button -->
+            <div class="mt-12 flex justify-center">
+                <a href="shop.html" class="border border-gray-800 text-gray-800 hover:bg-gray-800 hover:text-white px-8 py-3 text-sm font-bold uppercase transition bg-white">
+                    XEM THÊM
+                </a>
             </div>
         </div>
     </section>
@@ -124,47 +328,68 @@
     <script>
         document.addEventListener("DOMContentLoaded", async () => {
             await loadFeaturedProducts();
+            await loadCollectionProducts();
+            await loadTabbedProducts();
         });
 
         async function loadFeaturedProducts() {
             const container = document.getElementById("featured-products");
             try {
                 // Call Product API
-                const res = await apiFetch("ProductApi?page=1&pageSize=4");
+                const res = await apiFetch("ProductApi?page=1&pageSize=6&isDiscount=true");
                 if (res.ok) {
                     const data = await res.json();
                     if (data.products && data.products.length > 0) {
                         container.innerHTML = "";
                         data.products.forEach(p => {
-                            const priceHtml = p.discountPrice 
-                                ? `<span class="text-base font-black text-rose-500">${p.discountPrice.toLocaleString("vi-VN")}đ</span>
-                                   <span class="text-xs line-through text-gray-400 ml-2">${p.price.toLocaleString("vi-VN")}đ</span>` 
-                                : `<span class="text-base font-black text-gray-900">${p.price.toLocaleString("vi-VN")}đ</span>`;
+                            let percentHtml = "";
+                            let priceHtml = "";
+                            if (p.discountPrice && p.discountPrice < p.price) {
+                                const percent = Math.round(((p.price - p.discountPrice) / p.price) * 100);
+                                percentHtml = `<div class="absolute top-2 left-2 bg-red-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full z-10">-${percent}%</div>`;
+                                priceHtml = `<span class="text-sm font-bold text-red-600">${p.discountPrice.toLocaleString("vi-VN")}đ</span>
+                                             <span class="text-[10px] line-through text-gray-400 ml-2">${p.price.toLocaleString("vi-VN")}đ</span>`;
+                            } else {
+                                priceHtml = `<span class="text-sm font-bold text-gray-900">${p.price.toLocaleString("vi-VN")}đ</span>`;
+                            }
                             
                             const card = document.createElement("div");
-                            card.className = "group bg-white rounded-3xl border border-gray-100 overflow-hidden hover:shadow-2xl hover:shadow-indigo-500/5 transition duration-300 flex flex-col";
+                            card.className = "bg-white overflow-hidden shadow-sm hover:shadow-md transition duration-300 flex flex-col relative group";
                             card.innerHTML = `
-                                <div class="relative overflow-hidden aspect-[4/5] bg-gray-100">
-                                    <img src="${p.imageUrl}" alt="${p.name}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
-                                    ${p.discountPrice ? `<span class="absolute top-4 left-4 bg-rose-500 text-white text-[10px] font-black tracking-widest px-2.5 py-1 rounded-full uppercase shadow">Giảm giá</span>` : ""}
-                                </div>
-                                <div class="p-6 flex-1 flex flex-col">
-                                    <span class="text-xs text-gray-400 uppercase tracking-widest font-semibold">${p.categoryName || "Danh mục"}</span>
-                                    <h3 class="font-bold text-sm text-gray-800 mt-2 line-clamp-2 min-h-[40px] group-hover:text-indigo-600 transition"><a href="detail.html?id=${p.id}">${p.name}</a></h3>
-                                    <div class="mt-4 flex items-center justify-between">
-                                        <div class="flex flex-col">
-                                            ${priceHtml}
-                                        </div>
-                                        <a href="detail.html?id=${p.id}" class="px-3 py-1.5 bg-indigo-50 group-hover:bg-indigo-600 text-indigo-600 group-hover:text-white rounded-full text-[10px] font-bold transition-all duration-300 whitespace-nowrap">
-                                            Xem sản phẩm
+                                ${percentHtml}
+                                <div class="relative aspect-[4/5] bg-gray-50 overflow-hidden">
+                                    <a href="detail.html?id=${p.id}" class="block w-full h-full">
+                                        <img src="${p.imageUrl}" alt="${p.name}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                                    </a>
+                                    <!-- Hover actions -->
+                                    <div class="absolute bottom-0 left-0 right-0 p-2 translate-y-full opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 flex justify-center space-x-1 pointer-events-none z-10">
+                                        <button onclick="event.preventDefault(); ${p.defaultVariantId ? `typeof addToCart !== 'undefined' ? addToCart(${p.defaultVariantId}, 1).then(res => alert(res.message)) : alert('Vui lòng đăng nhập')` : `alert('Sản phẩm đã hết hàng')`}" class="pointer-events-auto flex-1 bg-white border border-gray-200 text-gray-900 text-[10px] font-bold uppercase py-2 flex items-center justify-center hover:bg-gray-50 transition shadow-sm rounded-sm">
+                                            <i class="fa-solid fa-bag-shopping mr-1.5 text-sm"></i> THÊM VÀO GIỎ
+                                        </button>
+                                        <a href="detail.html?id=${p.id}" class="pointer-events-auto bg-gray-800 text-white w-10 flex items-center justify-center hover:bg-gray-700 transition shadow-sm rounded-sm">
+                                            <i class="fa-regular fa-eye text-sm"></i>
                                         </a>
+                                    </div>
+                                </div>
+                                <div class="p-3 flex-1 flex flex-col justify-between">
+                                    <div>
+                                        <div class="flex justify-between text-[9px] text-gray-500 mb-1.5 uppercase font-medium">
+                                            <span>+4 Màu sắc</span>
+                                            <span>+5 Kích thước</span>
+                                        </div>
+                                        <h3 class="text-xs text-gray-800 line-clamp-2 min-h-[32px] group-hover:text-red-600 transition">
+                                            <a href="detail.html?id=${p.id}">${p.name}</a>
+                                        </h3>
+                                    </div>
+                                    <div class="mt-2 flex items-center">
+                                        ${priceHtml}
                                     </div>
                                 </div>
                             `;
                             container.appendChild(card);
                         });
                     } else {
-                        container.innerHTML = `<div class="col-span-full text-center text-gray-400 py-12">Không có sản phẩm nào.</div>`;
+                        container.innerHTML = `<div class="col-span-full text-center text-gray-400 py-12">Chưa có sản phẩm nào. Bạn có thể thêm sản phẩm từ trang Quản trị.</div>`;
                     }
                 } else {
                     container.innerHTML = `<div class="col-span-full text-center text-red-500 py-12">Lỗi tải dữ liệu sản phẩm.</div>`;
@@ -173,6 +398,286 @@
                 container.innerHTML = `<div class="col-span-full text-center text-red-500 py-12">Lỗi kết nối API: ${err.message}</div>`;
             }
         }
+
+        async function loadCollectionProducts() {
+            const container = document.getElementById("collection-products");
+            try {
+                // Call Product API (For collection we just fetch some products)
+                const res = await apiFetch("ProductApi?page=1&pageSize=6");
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.products && data.products.length > 0) {
+                        container.innerHTML = "";
+                        data.products.forEach(p => {
+                            let percentHtml = "";
+                            let priceHtml = "";
+                            if (p.discountPrice && p.discountPrice < p.price) {
+                                const percent = Math.round(((p.price - p.discountPrice) / p.price) * 100);
+                                percentHtml = `<div class="absolute top-2 left-2 bg-red-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full z-10">-${percent}%</div>`;
+                                priceHtml = `<span class="text-sm font-bold text-red-600">${p.discountPrice.toLocaleString("vi-VN")}đ</span>
+                                             <span class="text-[10px] line-through text-gray-400 ml-2">${p.price.toLocaleString("vi-VN")}đ</span>`;
+                            } else {
+                                priceHtml = `<span class="text-sm font-bold text-gray-900">${p.price.toLocaleString("vi-VN")}đ</span>`;
+                            }
+                            
+                            const card = document.createElement("div");
+                            card.className = "bg-white overflow-hidden shadow-sm hover:shadow-md transition duration-300 flex flex-col relative group";
+                            card.innerHTML = `
+                                ${percentHtml}
+                                <div class="relative aspect-[4/5] bg-gray-50 overflow-hidden">
+                                    <a href="detail.html?id=${p.id}" class="block w-full h-full">
+                                        <img src="${p.imageUrl}" alt="${p.name}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                                    </a>
+                                    <!-- Hover actions -->
+                                    <div class="absolute bottom-0 left-0 right-0 p-2 translate-y-full opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 flex justify-center space-x-1 pointer-events-none z-10">
+                                        <button onclick="event.preventDefault(); ${p.defaultVariantId ? `typeof addToCart !== 'undefined' ? addToCart(${p.defaultVariantId}, 1).then(res => alert(res.message)) : alert('Vui lòng đăng nhập')` : `alert('Sản phẩm đã hết hàng')`}" class="pointer-events-auto flex-1 bg-white border border-gray-200 text-gray-900 text-[10px] font-bold uppercase py-2 flex items-center justify-center hover:bg-gray-50 transition shadow-sm rounded-sm">
+                                            <i class="fa-solid fa-bag-shopping mr-1.5 text-sm"></i> THÊM VÀO GIỎ
+                                        </button>
+                                        <a href="detail.html?id=${p.id}" class="pointer-events-auto bg-gray-800 text-white w-10 flex items-center justify-center hover:bg-gray-700 transition shadow-sm rounded-sm">
+                                            <i class="fa-regular fa-eye text-sm"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="p-3 flex-1 flex flex-col justify-between">
+                                    <div>
+                                        <div class="flex justify-between text-[9px] text-gray-500 mb-1.5 uppercase font-medium">
+                                            <span>+4 Màu sắc</span>
+                                            <span>+5 Kích thước</span>
+                                        </div>
+                                        <h3 class="text-xs text-gray-800 line-clamp-2 min-h-[32px] group-hover:text-red-600 transition">
+                                            <a href="detail.html?id=${p.id}">${p.name}</a>
+                                        </h3>
+                                    </div>
+                                    <div class="mt-2 flex items-center">
+                                        ${priceHtml}
+                                    </div>
+                                </div>
+                            `;
+                            container.appendChild(card);
+                        });
+                    } else {
+                        container.innerHTML = `<div class="col-span-full text-center text-gray-400 py-12">Chưa có sản phẩm nào. Bạn có thể thêm sản phẩm từ trang Quản trị.</div>`;
+                    }
+                } else {
+                    container.innerHTML = `<div class="col-span-full text-center text-red-500 py-12">Lỗi tải dữ liệu sản phẩm.</div>`;
+                }
+            } catch (err) {
+                container.innerHTML = `<div class="col-span-full text-center text-red-500 py-12">Lỗi kết nối API: ${err.message}</div>`;
+            }
+        }
+
+        function switchTab(btn, tabType) {
+            // Remove active styles from all tabs
+            document.querySelectorAll('.tab-btn').forEach(el => {
+                el.classList.remove('text-gray-900', 'border-gray-900');
+                el.classList.add('text-gray-400', 'border-transparent');
+            });
+            // Add active styles to clicked tab
+            btn.classList.remove('text-gray-400', 'border-transparent');
+            btn.classList.add('text-gray-900', 'border-gray-900');
+            
+            // Update the "View all" button link and text
+            const viewAllBtn = document.getElementById("view-all-tabbed-btn");
+            if (viewAllBtn) {
+                if (tabType === 'featured') {
+                    viewAllBtn.href = "shop.html";
+                    viewAllBtn.textContent = "XEM TẤT CẢ SẢN PHẨM NỔI BẬT";
+                } else if (tabType === 'thudong') {
+                    viewAllBtn.href = "shop.html?search=áo khoác";
+                    viewAllBtn.textContent = "XEM TẤT CẢ ĐỒ THU ĐÔNG";
+                } else if (tabType === 'congso') {
+                    viewAllBtn.href = "shop.html?search=sơ mi";
+                    viewAllBtn.textContent = "XEM TẤT CẢ ĐỒ CÔNG SỞ";
+                } else if (tabType === 'thethao') {
+                    viewAllBtn.href = "shop.html?search=thể thao";
+                    viewAllBtn.textContent = "XEM TẤT CẢ ĐỒ THỂ THAO";
+                }
+            }
+            
+            loadTabbedProducts(tabType);
+        }
+
+        async function loadTabbedProducts(tabType = 'featured') {
+            const container = document.getElementById("tabbed-products");
+            container.innerHTML = `
+                <div class="col-span-full text-center py-12 text-gray-400">
+                    <i class="fa-solid fa-spinner animate-spin text-3xl mb-3"></i>
+                    <p>Đang tải danh sách sản phẩm...</p>
+                </div>
+            `;
+            try {
+                // Fetch up to 50 products to filter at client side based on tab
+                const res = await apiFetch("ProductApi?page=1&pageSize=50");
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.products && data.products.length > 0) {
+                        let filteredProducts = [];
+                        
+                        if (tabType === 'featured') {
+                            filteredProducts = data.products.slice(0, 10);
+                        } else if (tabType === 'thudong') {
+                            const keywords = ["hoodie", "khoác", "nỉ", "len", "dài tay", "thu đông", "áo ấm", "áo phao"];
+                            filteredProducts = data.products.filter(p => {
+                                const nameLower = p.name.toLowerCase();
+                                const descLower = (p.description || "").toLowerCase();
+                                const typeLower = (p.productTypeName || "").toLowerCase();
+                                return keywords.some(k => nameLower.includes(k) || descLower.includes(k) || typeLower.includes(k));
+                            }).slice(0, 10);
+                        } else if (tabType === 'congso') {
+                            const keywords = ["sơ mi", "sơmi", "quần tây", "quần âu", "vest", "blazer", "công sở", "polo", "âu"];
+                            filteredProducts = data.products.filter(p => {
+                                const nameLower = p.name.toLowerCase();
+                                const descLower = (p.description || "").toLowerCase();
+                                const typeLower = (p.productTypeName || "").toLowerCase();
+                                return keywords.some(k => nameLower.includes(k) || descLower.includes(k) || typeLower.includes(k));
+                            }).slice(0, 10);
+                        } else if (tabType === 'thethao') {
+                            const keywords = ["short", "jogger", "thể thao", "nike", "adidas", "chạy bộ", "tập gym", "vớ", "tất", "cap"];
+                            filteredProducts = data.products.filter(p => {
+                                const nameLower = p.name.toLowerCase();
+                                const descLower = (p.description || "").toLowerCase();
+                                const typeLower = (p.productTypeName || "").toLowerCase();
+                                const brandLower = (p.brandName || "").toLowerCase();
+                                return keywords.some(k => nameLower.includes(k) || descLower.includes(k) || typeLower.includes(k) || brandLower.includes(k));
+                            }).slice(0, 10);
+                        }
+
+                        if (filteredProducts.length > 0) {
+                            container.innerHTML = "";
+                            filteredProducts.forEach(p => {
+                                let percentHtml = "";
+                                let priceHtml = "";
+                                if (p.discountPrice && p.discountPrice < p.price) {
+                                    const percent = Math.round(((p.price - p.discountPrice) / p.price) * 100);
+                                    percentHtml = `<div class="absolute top-2 left-2 bg-red-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full z-10">-${percent}%</div>`;
+                                    priceHtml = `<span class="text-sm font-bold text-red-600">${p.discountPrice.toLocaleString("vi-VN")}đ</span>
+                                                 <span class="text-[10px] line-through text-gray-400 ml-2">${p.price.toLocaleString("vi-VN")}đ</span>`;
+                                } else {
+                                    priceHtml = `<span class="text-sm font-bold text-gray-900">${p.price.toLocaleString("vi-VN")}đ</span>`;
+                                }
+                                
+                                const card = document.createElement("div");
+                                card.className = "bg-white overflow-hidden shadow-sm hover:shadow-md transition duration-300 flex flex-col relative group";
+                                card.innerHTML = `
+                                    ${percentHtml}
+                                    <div class="relative aspect-[4/5] bg-gray-50 overflow-hidden">
+                                        <a href="detail.html?id=${p.id}" class="block w-full h-full">
+                                            <img src="${p.imageUrl}" alt="${p.name}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                                        </a>
+                                        <!-- Hover actions -->
+                                        <div class="absolute bottom-0 left-0 right-0 p-2 translate-y-full opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 flex justify-center space-x-1 pointer-events-none z-10">
+                                            <button onclick="event.preventDefault(); typeof addToCart !== 'undefined' ? addToCart(${p.id}, 1).then(res => alert(res.message)) : alert('Vui lòng đăng nhập')" class="pointer-events-auto flex-1 bg-white border border-gray-200 text-gray-900 text-[10px] font-bold uppercase py-2 flex items-center justify-center hover:bg-gray-50 transition shadow-sm rounded-sm">
+                                                <i class="fa-solid fa-bag-shopping mr-1.5 text-sm"></i> THÊM VÀO GIỎ
+                                            </button>
+                                            <a href="detail.html?id=${p.id}" class="pointer-events-auto bg-gray-800 text-white w-10 flex items-center justify-center hover:bg-gray-700 transition shadow-sm rounded-sm">
+                                                <i class="fa-regular fa-eye text-sm"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <div class="p-3 flex-1 flex flex-col justify-between">
+                                        <div>
+                                            <div class="flex justify-between text-[9px] text-gray-500 mb-1.5 uppercase font-medium">
+                                                <span>+4 Màu sắc</span>
+                                                <span>+5 Kích thước</span>
+                                            </div>
+                                            <h3 class="text-xs text-gray-800 line-clamp-2 min-h-[32px] group-hover:text-red-600 transition">
+                                                <a href="detail.html?id=${p.id}">${p.name}</a>
+                                            </h3>
+                                        </div>
+                                        <div class="mt-2 flex items-center">
+                                            ${priceHtml}
+                                        </div>
+                                    </div>
+                                `;
+                                container.appendChild(card);
+                            });
+                        } else {
+                            container.innerHTML = `<div class="col-span-full text-center text-gray-400 py-12">Chưa có sản phẩm nào thuộc nhóm này. Bạn có thể thêm sản phẩm từ trang Quản trị.</div>`;
+                        }
+                    } else {
+                        container.innerHTML = `<div class="col-span-full text-center text-gray-400 py-12">Chưa có sản phẩm nào. Bạn có thể thêm sản phẩm từ trang Quản trị.</div>`;
+                    }
+                } else {
+                    container.innerHTML = `<div class="col-span-full text-center text-red-500 py-12">Lỗi tải dữ liệu sản phẩm.</div>`;
+                }
+            } catch (err) {
+                container.innerHTML = `<div class="col-span-full text-center text-red-500 py-12">Lỗi kết nối API: ${err.message}</div>`;
+            }
+        }
+
+        // Hero Carousel Logic
+        document.addEventListener("DOMContentLoaded", () => {
+            const slider = document.getElementById("hero-slider");
+            const slides = slider.children;
+            const dots = document.getElementById("hero-dots").children;
+            const prevBtn = document.getElementById("hero-prev");
+            const nextBtn = document.getElementById("hero-next");
+            
+            let currentIndex = 0;
+            const totalSlides = slides.length;
+            let intervalId;
+
+            function updateCarousel() {
+                // Move slider
+                slider.style.transform = `translateX(-${currentIndex * 100}%)`;
+                
+                // Update dots
+                Array.from(dots).forEach((dot, index) => {
+                    if (index === currentIndex) {
+                        dot.className = "w-2.5 h-2.5 rounded-full bg-red-600 transition-all scale-110";
+                    } else {
+                        dot.className = "w-2.5 h-2.5 rounded-full bg-white/50 hover:bg-white transition-all";
+                    }
+                });
+            }
+
+            function nextSlide() {
+                currentIndex = (currentIndex + 1) % totalSlides;
+                updateCarousel();
+            }
+
+            function prevSlide() {
+                currentIndex = (currentIndex - 1 + totalSlides) % totalSlides;
+                updateCarousel();
+            }
+
+            function startAutoPlay() {
+                stopAutoPlay();
+                intervalId = setInterval(nextSlide, 5000); // 5 seconds
+            }
+
+            function stopAutoPlay() {
+                if (intervalId) clearInterval(intervalId);
+            }
+
+            // Event Listeners
+            prevBtn.addEventListener("click", () => {
+                prevSlide();
+                startAutoPlay(); // Reset timer
+            });
+
+            nextBtn.addEventListener("click", () => {
+                nextSlide();
+                startAutoPlay(); // Reset timer
+            });
+
+            Array.from(dots).forEach((dot, index) => {
+                dot.addEventListener("click", () => {
+                    currentIndex = index;
+                    updateCarousel();
+                    startAutoPlay(); // Reset timer
+                });
+            });
+
+            // Pause on hover
+            const carouselContainer = document.getElementById("hero-carousel");
+            carouselContainer.addEventListener("mouseenter", stopAutoPlay);
+            carouselContainer.addEventListener("mouseleave", startAutoPlay);
+
+            // Initialize
+            updateCarousel();
+            startAutoPlay();
+        });
     </script>
 </body>
 </html>

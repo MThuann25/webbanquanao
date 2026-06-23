@@ -242,6 +242,14 @@ function injectHeader() {
                 
                 <!-- Actions -->
                 <div class="flex items-center space-x-4">
+                    <!-- Search Bar -->
+                    <form onsubmit="event.preventDefault(); const q = this.querySelector('input').value; if(q) window.location.href='shop.html?search='+encodeURIComponent(q);" class="hidden sm:flex relative text-gray-600">
+                        <input type="search" placeholder="Tìm kiếm..." class="bg-gray-100 h-10 px-5 pr-10 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 w-40 lg:w-64 transition-all border border-transparent focus:bg-white focus:border-indigo-200">
+                        <button type="submit" class="absolute right-0 top-0 mt-2.5 mr-4 text-gray-400 hover:text-indigo-600 transition">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </button>
+                    </form>
+
                     <!-- Cart -->
                     <a href="cart.html" class="relative p-2 text-gray-600 hover:text-indigo-600 transition">
                         <i class="fa-solid fa-bag-shopping text-xl"></i>
@@ -274,7 +282,7 @@ function injectHeader() {
                 </button>
                 <div class="absolute right-0 w-48 mt-1 origin-top-right bg-white rounded-xl shadow-xl border border-gray-100 divide-y divide-gray-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition duration-150 z-50">
                     <div class="py-1">
-                        <a href="profile.html" class="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50"><i class="fa-regular fa-id-card mr-2 text-gray-400"></i>Hồ sơ của tôi</a>
+                        ${!isAdmin ? `<a href="profile.html" class="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50"><i class="fa-regular fa-id-card mr-2 text-gray-400"></i>Hồ sơ của tôi</a>` : ""}
                         ${isAdmin ? `<a href="admin.html" class="flex items-center px-4 py-2.5 text-sm text-rose-600 hover:bg-gray-50 font-medium"><i class="fa-solid fa-user-gear mr-2 text-rose-400"></i>Trang quản trị</a>` : ""}
                     </div>
                     <div class="py-1">
@@ -298,34 +306,71 @@ function injectFooter() {
     const footerHtml = `
     <footer class="bg-gray-900 text-gray-400 pt-16 pb-8 border-t border-gray-800">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
-                <div class="md:col-span-2">
-                    <span class="text-2xl font-black tracking-wider" style="background:linear-gradient(135deg,#818cf8,#a78bfa,#e879f9);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-family:'Times New Roman',Times,serif;">DMTShop</span>
-                    <p class="mt-4 text-sm leading-relaxed max-w-sm text-gray-400">Website mua sắm thời trang trực tuyến hàng đầu Việt Nam. Cung cấp các sản phẩm chất lượng cao với xu hướng thiết kế mới nhất.</p>
-                </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
+                <!-- Col 1: Thời trang nam -->
                 <div>
-                    <h3 class="text-sm font-semibold text-white uppercase tracking-wider mb-4">Danh mục</h3>
-                    <ul class="space-y-2">
-                        <li><a href="shop.html?categoryId=1" class="hover:text-white transition">Áo Nam</a></li>
-                        <li><a href="shop.html?categoryId=2" class="hover:text-white transition">Quần Nam</a></li>
-                        <li><a href="shop.html?categoryId=3" class="hover:text-white transition">Áo Nữ</a></li>
-                        <li><a href="shop.html?categoryId=4" class="hover:text-white transition">Váy Nữ</a></li>
+                    <h3 class="text-sm font-semibold text-white uppercase tracking-wider mb-4">Thời trang nam DMTShop</h3>
+                    <p class="mt-4 text-sm leading-relaxed text-gray-400">Hệ thống thời trang cho phái mạnh hàng đầu Việt Nam, hướng tới phong cách nam tính, lịch lãm và trẻ trung.</p>
+                    <div class="mt-6 flex space-x-3">
+                        <a href="#" class="w-8 h-8 rounded border border-gray-700 flex items-center justify-center hover:bg-gray-800 hover:text-white transition"><i class="fa-brands fa-facebook-f text-sm"></i></a>
+                        <a href="#" class="w-8 h-8 rounded border border-gray-700 flex items-center justify-center hover:bg-gray-800 hover:text-white transition"><i class="fa-brands fa-twitter text-sm"></i></a>
+                        <a href="#" class="w-8 h-8 rounded border border-gray-700 flex items-center justify-center hover:bg-gray-800 hover:text-white transition"><i class="fa-brands fa-instagram text-sm"></i></a>
+                        <a href="#" class="w-8 h-8 rounded border border-gray-700 flex items-center justify-center hover:bg-gray-800 hover:text-white transition"><i class="fa-brands fa-tiktok text-sm"></i></a>
+                        <a href="#" class="w-8 h-8 rounded border border-gray-700 flex items-center justify-center hover:bg-gray-800 hover:text-white transition"><i class="fa-brands fa-youtube text-sm"></i></a>
+                    </div>
+                    <h4 class="text-xs font-semibold text-white uppercase tracking-wider mt-8 mb-4">Phương thức thanh toán</h4>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="px-2 py-1 bg-white text-blue-600 rounded text-xs font-bold">VNPAY</span>
+                        <span class="px-2 py-1 bg-white text-green-500 rounded text-xs font-bold">ZaloPay</span>
+                        <span class="px-2 py-1 bg-white text-indigo-600 rounded text-xs font-bold">VISA</span>
+                        <span class="px-2 py-1 bg-white text-gray-800 rounded text-xs font-bold">MoMo</span>
+                    </div>
+                </div>
+
+                <!-- Col 2: Thông tin liên hệ -->
+                <div>
+                    <h3 class="text-sm font-semibold text-white uppercase tracking-wider mb-4">Thông tin liên hệ</h3>
+                    <ul class="space-y-3 text-sm text-gray-400">
+                        <li><strong class="text-white font-medium">Địa chỉ:</strong> Tòa s1.02 Vinhome grandPark, Nguyễn Xiển, Q9, Tp.HCM.</li>
+                        <li><strong class="text-white font-medium">Điện thoại:</strong> 0388.346.580</li>
+                        <li><strong class="text-white font-medium">Email:</strong> nguyetle04112004@gmail.com</li>
                     </ul>
+                    <h4 class="text-xs font-semibold text-white uppercase tracking-wider mt-8 mb-4">Phương thức vận chuyển</h4>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="px-2 py-1 bg-white text-orange-500 rounded text-xs font-bold italic">GHN</span>
+                        <span class="px-2 py-1 bg-white text-red-600 rounded text-xs font-bold italic">Ninja</span>
+                        <span class="px-2 py-1 bg-white text-orange-600 rounded text-xs font-bold italic">AhaMove</span>
+                        <span class="px-2 py-1 bg-white text-red-500 rounded text-xs font-bold italic">J&T Express</span>
+                    </div>
                 </div>
+
+                <!-- Col 3: Đăng ký nhận tin -->
                 <div>
-                    <h3 class="text-sm font-semibold text-white uppercase tracking-wider mb-4">Hỗ trợ</h3>
-                    <p class="text-sm">Hotline: 1800 6688</p>
-                    <p class="text-sm mt-2">Email: support@clothingshop.com</p>
-                    <p class="text-sm mt-2">Địa chỉ: 123 Main St, Hanoi, Vietnam</p>
+                    <h3 class="text-sm font-semibold text-white uppercase tracking-wider mb-4">Đăng ký nhận tin</h3>
+                    <p class="text-sm leading-relaxed text-gray-400 mb-4">Để cập nhật những sản phẩm mới, nhận thông tin ưu đãi đặc biệt và thông tin giảm giá khác.</p>
+                    <form class="flex" onsubmit="event.preventDefault();">
+                        <div class="relative flex-1">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fa-regular fa-envelope text-gray-400"></i>
+                            </div>
+                            <input type="email" placeholder="Nhập email của bạn" class="w-full pl-10 pr-4 py-2.5 bg-gray-800 border border-gray-700 text-white text-sm rounded-l focus:outline-none focus:border-indigo-500 transition">
+                        </div>
+                        <button type="submit" class="px-5 py-2.5 bg-gray-200 hover:bg-gray-300 text-gray-900 text-sm font-bold uppercase rounded-r transition">Đăng ký</button>
+                    </form>
+                    <div class="mt-8">
+                        <div class="inline-flex items-center space-x-3 border border-blue-500/30 p-2.5 rounded-lg bg-blue-500/10">
+                            <i class="fa-solid fa-shield-check text-blue-500 text-3xl"></i>
+                            <div class="flex flex-col text-left">
+                                <span class="text-[10px] font-bold text-blue-400 uppercase leading-none">Đã thông báo</span>
+                                <span class="text-xs font-black text-blue-500 uppercase leading-none mt-1.5 tracking-wider">Bộ công thương</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center text-xs">
-                <p>&copy; 2026 ClothingShop. All Rights Reserved.</p>
-                <div class="flex space-x-6 mt-4 md:mt-0">
-                    <a href="#" class="hover:text-white"><i class="fa-brands fa-facebook text-lg"></i></a>
-                    <a href="#" class="hover:text-white"><i class="fa-brands fa-instagram text-lg"></i></a>
-                    <a href="#" class="hover:text-white"><i class="fa-brands fa-youtube text-lg"></i></a>
-                </div>
+            
+            <div class="border-t border-gray-800 pt-8 flex flex-col items-center text-xs text-gray-500">
+                <p>&copy; 2026 DMTShop. All Rights Reserved.</p>
             </div>
         </div>
     </footer>

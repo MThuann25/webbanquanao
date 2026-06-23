@@ -22,6 +22,7 @@ namespace ClothingShop.Application.Services
             return await _unitOfWork.Repository<Product>().GetQueryable()
                 .Include(p => p.Brand)
                 .Include(p => p.Category)
+                .Include(p => p.ProductType)
                 .Include(p => p.ProductImages)
                 .Include(p => p.ProductVariants)
                 .Include(p => p.Reviews)
@@ -40,13 +41,14 @@ namespace ClothingShop.Application.Services
         }
 
         public async Task<(IEnumerable<Product> Products, int TotalCount)> GetFilteredProductsAsync(
-            string search, int? categoryId, int? brandId, string size, string color, 
-            decimal? minPrice, decimal? maxPrice, string sortBy, int page, int pageSize)
+            string search, int? categoryId, int? brandId, int? productTypeId, string size, string color, 
+            decimal? minPrice, decimal? maxPrice, string sortBy, int page, int pageSize, bool? isDiscount = null)
         {
             var query = _unitOfWork.Repository<Product>().GetQueryable()
                 .Where(p => p.IsActive)
                 .Include(p => p.Brand)
                 .Include(p => p.Category)
+                .Include(p => p.ProductType)
                 .Include(p => p.ProductImages)
                 .Include(p => p.ProductVariants)
                 .AsQueryable();
@@ -72,6 +74,12 @@ namespace ClothingShop.Application.Services
                 query = query.Where(p => p.BrandId == brandId.Value);
             }
 
+            // Filter by ProductType
+            if (productTypeId.HasValue)
+            {
+                query = query.Where(p => p.ProductTypeId == productTypeId.Value);
+            }
+
             // Filter by Variant Size
             if (!string.IsNullOrEmpty(size))
             {
@@ -92,6 +100,12 @@ namespace ClothingShop.Application.Services
             if (maxPrice.HasValue)
             {
                 query = query.Where(p => (p.DiscountPrice ?? p.Price) <= maxPrice.Value);
+            }
+
+            // Filter by Discount
+            if (isDiscount.HasValue && isDiscount.Value)
+            {
+                query = query.Where(p => p.DiscountPrice.HasValue && p.DiscountPrice.Value > 0 && p.DiscountPrice.Value < p.Price);
             }
 
             // Sort

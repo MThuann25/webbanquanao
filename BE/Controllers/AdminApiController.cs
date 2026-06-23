@@ -111,7 +111,7 @@ namespace ClothingShop.Web.Controllers
         [HttpGet("products")]
         public async Task<IActionResult> GetProducts([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
         {
-            var result = await _productService.GetFilteredProductsAsync(null, null, null, null, null, null, null, "newest", page, pageSize);
+            var result = await _productService.GetFilteredProductsAsync(null, null, null, null, null, null, null, null, "newest", page, pageSize);
             
             var productsList = result.Products.Select(p => new
             {
@@ -122,6 +122,7 @@ namespace ClothingShop.Web.Controllers
                 isActive = p.IsActive,
                 categoryName = p.Category?.Name,
                 brandName = p.Brand?.Name,
+                productTypeName = p.ProductType?.Name,
                 stock = p.ProductVariants.Sum(v => v.Quantity)
             }).ToList();
 
@@ -147,6 +148,7 @@ namespace ClothingShop.Web.Controllers
                 DiscountPrice = model.DiscountPrice,
                 CategoryId = model.CategoryId,
                 BrandId = model.BrandId,
+                ProductTypeId = model.ProductTypeId,
                 IsActive = model.IsActive,
                 CreatedDate = DateTime.UtcNow
             };
@@ -212,6 +214,7 @@ namespace ClothingShop.Web.Controllers
             product.DiscountPrice = model.DiscountPrice;
             product.CategoryId = model.CategoryId;
             product.BrandId = model.BrandId;
+            product.ProductTypeId = model.ProductTypeId;
             product.IsActive = model.IsActive;
 
             // Handle Main Image Update
@@ -647,6 +650,7 @@ namespace ClothingShop.Web.Controllers
         public decimal? DiscountPrice { get; set; }
         public int? CategoryId { get; set; }
         public int? BrandId { get; set; }
+        public int? ProductTypeId { get; set; }
         public bool IsActive { get; set; } = true;
         public string? Sizes { get; set; }
         public string? Colors { get; set; }
@@ -663,6 +667,7 @@ namespace ClothingShop.Web.Controllers
         public decimal? DiscountPrice { get; set; }
         public int? CategoryId { get; set; }
         public int? BrandId { get; set; }
+        public int? ProductTypeId { get; set; }
         public bool IsActive { get; set; }
         public string? MainImageUrl { get; set; }
     }
