@@ -151,7 +151,8 @@ namespace ClothingShop.Infrastructure.Data
             }
 
             // 5. Seed Products, Images, and Variants
-            if (!await context.Products.AnyAsync())
+            // Đã tắt tự động seed để người dùng tự thêm sản phẩm
+            if (false && !await context.Products.AnyAsync())
             {
                 var zara = await context.Brands.FirstAsync(b => b.Name == "Zara");
                 var uniqlo = await context.Brands.FirstAsync(b => b.Name == "Uniqlo");
