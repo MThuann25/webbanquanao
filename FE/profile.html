@@ -1,9 +1,9 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ClothingShop - Trang Cá Nhân</title>
+    <title>DMTShop - Trang Cá Nhân</title>
     <!-- Fonts & Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Tailwind CSS -->
@@ -36,22 +36,92 @@
         <div id="alert-box" class="hidden mb-6 p-4 rounded-xl text-xs font-semibold"></div>
 
         <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
-            <!-- Sidebar Tabs Nav -->
-            <aside class="bg-white border border-gray-150 rounded-3xl p-6 shadow-sm self-start space-y-2">
-                <button onclick="switchTab('profile-info')" id="tab-btn-profile-info" class="tab-btn w-full px-4 py-2.5 text-left text-xs font-bold rounded-xl transition bg-indigo-550 text-indigo-600 bg-indigo-50 flex items-center space-x-2">
-                    <i class="fa-regular fa-user text-sm"></i>
-                    <span>Thông tin tài khoản</span>
-                </button>
-                <button onclick="switchTab('profile-orders')" id="tab-btn-profile-orders" class="tab-btn w-full px-4 py-2.5 text-left text-xs font-bold rounded-xl transition text-gray-500 hover:bg-gray-50 flex items-center space-x-2">
-                    <i class="fa-solid fa-receipt text-sm"></i>
-                    <span>Lịch sử đặt hàng</span>
-                </button>
+            <!-- Sidebar & Membership VIP Card -->
+            <aside class="space-y-6 self-start">
+                <!-- User Avatar & Quick Info -->
+                <div class="bg-white border border-gray-150 rounded-3xl p-6 shadow-sm flex flex-col items-center text-center relative group">
+                    <div class="relative w-24 h-24 mb-3">
+                        <img id="user-avatar" src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=200" class="w-24 h-24 rounded-full object-cover border-4 border-indigo-50/50 shadow-md group-hover:opacity-95 transition">
+                        <label for="avatar-input" class="absolute bottom-0 right-0 w-8 h-8 bg-indigo-600 hover:bg-indigo-750 text-white rounded-full flex items-center justify-center cursor-pointer shadow-md transition hover:scale-105">
+                            <i class="fa-solid fa-camera text-[10px]"></i>
+                        </label>
+                        <input type="file" id="avatar-input" class="hidden" accept="image/*" onchange="uploadUserAvatar(event)">
+                    </div>
+                    <h3 class="font-bold text-sm text-gray-800" id="user-sidebar-name">Khách Hàng</h3>
+                    <p class="text-[10px] text-gray-400" id="user-sidebar-email">user@clothingshop.com</p>
+                </div>
+
+                <!-- Navigation Tabs -->
+                <div class="bg-white border border-gray-150 rounded-3xl p-5 shadow-sm space-y-2">
+                    <button onclick="switchTab('profile-info')" id="tab-btn-profile-info" class="tab-btn w-full px-4 py-2.5 text-left text-xs font-bold rounded-xl transition bg-indigo-50 text-indigo-600 flex items-center space-x-2">
+                        <i class="fa-regular fa-user text-sm"></i>
+                        <span>Thông tin tài khoản</span>
+                    </button>
+                    <button onclick="switchTab('profile-orders')" id="tab-btn-profile-orders" class="tab-btn w-full px-4 py-2.5 text-left text-xs font-bold rounded-xl transition text-gray-500 hover:bg-gray-50 flex items-center space-x-2">
+                        <i class="fa-solid fa-receipt text-sm"></i>
+                        <span>Lịch sử đặt hàng</span>
+                    </button>
+                    <button onclick="switchTab('profile-rewards')" id="tab-btn-profile-rewards" class="tab-btn w-full px-4 py-2.5 text-left text-xs font-bold rounded-xl transition text-gray-500 hover:bg-gray-50 flex items-center space-x-2">
+                        <i class="fa-solid fa-gift text-sm"></i>
+                        <span>Đổi điểm nhận quà</span>
+                    </button>
+                </div>
             </aside>
 
             <!-- Tabs Content -->
             <section class="lg:col-span-3">
                 <!-- Tab: Profile Info -->
                 <div id="tab-profile-info" class="tab-content bg-white border border-gray-150 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6">
+                    <!-- Membership Status Horizontal Grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch border-b border-gray-100 pb-6 mb-6">
+                        <!-- Virtual Membership Card -->
+                        <div id="vip-card" class="relative overflow-hidden rounded-3xl p-6 text-white shadow-xl transition-all duration-300 hover:scale-[1.01] hover:shadow-2xl w-full">
+                            <div class="absolute inset-0 bg-white/5 backdrop-blur-[1px] bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.15),transparent)]"></div>
+                            <div class="relative z-10 flex flex-col justify-between h-40 drop-shadow-[0_1.5px_1.5px_rgba(0,0,0,0.5)]">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <span class="text-xs font-black tracking-widest text-white">DMTShop</span>
+                                        <span class="block text-[8px] tracking-widest text-white/90 uppercase font-bold" id="membership-tier-label">MEMBER</span>
+                                    </div>
+                                    <div class="text-yellow-300 text-lg" id="membership-crown">
+                                        <i class="fa-solid fa-crown"></i>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-7 h-5 bg-gradient-to-r from-yellow-500 to-amber-300 rounded-md opacity-80 shadow-inner flex items-center justify-center">
+                                        <div class="grid grid-cols-3 gap-0.5 w-4 h-3 bg-amber-800/20 rounded"></div>
+                                    </div>
+                                    <span class="text-sm font-mono tracking-widest text-white" id="vip-card-number">DMT-8888-0000</span>
+                                </div>
+                                
+                                <div class="flex justify-between items-end border-t border-white/20 pt-2">
+                                    <div>
+                                        <span class="block text-[8px] text-white/80 uppercase font-bold">Chủ thẻ</span>
+                                        <span class="text-xs font-bold uppercase tracking-wide text-white block" id="vip-card-name">KHÁCH HÀNG</span>
+
+                                    </div>
+                                    <div class="text-right">
+                                        <span class="block text-[8px] text-white/80 uppercase font-bold">Điểm tích lũy</span>
+                                        <span class="text-sm font-black text-yellow-300" id="vip-card-points">0 PTS</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Membership Tier Progress -->
+                        <div class="bg-gray-50/70 border border-gray-150 rounded-3xl p-6 flex flex-col justify-center space-y-4">
+                            <div class="flex justify-between items-center text-xxs font-bold text-gray-500">
+                                <span class="uppercase tracking-wider">Tiến trình nâng cấp</span>
+                                <span id="tier-next-progress-label" class="text-indigo-650 font-black">0/500 PTS</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2.5 overflow-hidden">
+                                <div id="tier-progress-bar" class="bg-indigo-650 h-2.5 rounded-full transition-all duration-500" style="width: 0%;"></div>
+                            </div>
+                            <p class="text-[10px] text-gray-400 leading-relaxed" id="tier-next-hint">Tích thêm 500 điểm để thăng hạng VIP Vàng (Gold).</p>
+                        </div>
+                    </div>
+
                     <h3 class="font-bold text-xs uppercase text-gray-400 tracking-wider">Cập nhật thông tin liên hệ</h3>
                     
                     <form onsubmit="handleProfileUpdate(event)" class="space-y-4">
@@ -96,6 +166,42 @@
                         </table>
                     </div>
                 </div>
+
+                <!-- Tab: Rewards Store -->
+                <div id="tab-profile-rewards" class="tab-content bg-white border border-gray-150 rounded-3xl p-6 shadow-sm hidden space-y-6">
+                    <div class="border-b border-gray-100 pb-4">
+                        <h3 class="font-bold text-xs uppercase text-gray-400 tracking-wider">Cửa hàng đổi quà tặng</h3>
+                        <p class="text-[10px] text-gray-400 mt-1">Sử dụng điểm tích lũy mua hàng của bạn để đổi các mã giảm giá đặc quyền tại DMTShop.</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="bg-gradient-to-br from-indigo-50 to-purple-50 border border-indigo-100 rounded-3xl p-6 flex flex-col justify-between shadow-sm relative overflow-hidden group">
+                            <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-indigo-500/5 rounded-full group-hover:scale-125 transition-transform duration-300"></div>
+                            <div class="space-y-3">
+                                <div class="flex justify-between items-center">
+                                    <span class="px-2.5 py-1 rounded-full text-[9px] font-black tracking-wider bg-indigo-600 text-white uppercase shadow-sm">Voucher 50,000đ</span>
+                                    <span class="text-xs font-bold text-indigo-600 flex items-center"><i class="fa-solid fa-coins mr-1 text-indigo-500"></i>500 Điểm</span>
+                                </div>
+                                <h4 class="font-black text-sm text-gray-800">Mã giảm giá mua sắm 50K</h4>
+                                <p class="text-[10px] text-gray-400 leading-relaxed">Áp dụng giảm trực tiếp 50.000 VNĐ cho bất kỳ đơn hàng nào tại DMTShop. Hạn sử dụng 30 ngày kể từ lúc đổi.</p>
+                            </div>
+                            <button onclick="redeemVoucher('50K')" class="mt-6 w-full py-2.5 bg-indigo-600 hover:bg-indigo-750 text-white rounded-full text-xs font-bold transition shadow-md shadow-indigo-100">Đổi ngay</button>
+                        </div>
+
+                        <div class="bg-gradient-to-br from-rose-50 to-pink-50 border border-rose-100 rounded-3xl p-6 flex flex-col justify-between shadow-sm relative overflow-hidden group">
+                            <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-rose-500/5 rounded-full group-hover:scale-125 transition-transform duration-300"></div>
+                            <div class="space-y-3">
+                                <div class="flex justify-between items-center">
+                                    <span class="px-2.5 py-1 rounded-full text-[9px] font-black tracking-wider bg-rose-500 text-white uppercase shadow-sm">Voucher 100,000đ</span>
+                                    <span class="text-xs font-bold text-rose-500 flex items-center"><i class="fa-solid fa-coins mr-1 text-rose-500"></i>1000 Điểm</span>
+                                </div>
+                                <h4 class="font-black text-sm text-gray-800">Mã giảm giá mua sắm 100K</h4>
+                                <p class="text-[10px] text-gray-400 leading-relaxed">Áp dụng giảm trực tiếp 100.000 VNĐ cho bất kỳ đơn hàng nào tại DMTShop. Hạn sử dụng 30 ngày kể từ lúc đổi.</p>
+                            </div>
+                            <button onclick="redeemVoucher('100K')" class="mt-6 w-full py-2.5 bg-rose-500 hover:bg-rose-650 text-white rounded-full text-xs font-bold transition shadow-md shadow-rose-100">Đổi ngay</button>
+                        </div>
+                    </div>
+                </div>
             </section>
         </div>
     </main>
@@ -122,32 +228,71 @@
     <script src="js/app.js"></script>
     <script>
         document.addEventListener("DOMContentLoaded", async () => {
-            const user = getCurrentUser();
+            let user = getCurrentUser();
             if (!user) {
                 window.location.href = "login.html";
                 return;
             }
 
-            // External login check
             const params = new URLSearchParams(window.location.search);
             if (params.has("loginSuccess")) {
-                // Fetch full info to update user model locally
-                await checkAuthStatus();
-                // Clear query params
+                user = await checkAuthStatus();
                 window.history.replaceState({}, document.title, window.location.pathname);
             }
 
-            // Sync guest cart if needed
-            await syncGuestCartOnLogin();
+            try {
+                if (typeof syncGuestCartOnLogin === "function") {
+                    await syncGuestCartOnLogin();
+                }
+            } catch (e) {
+                console.warn("syncGuestCartOnLogin is not defined:", e);
+            }
 
-            // Populate Info Tab
-            document.getElementById("prof-name").value = user.fullName || "";
-            document.getElementById("prof-phone").value = user.phoneNumber || "";
-            document.getElementById("prof-address").value = user.address || "";
+            // Hàm cập nhật giao diện người dùng
+            function updateUI(userData) {
+                console.log("=== UPDATE UI ===", userData);
+                if (!userData) return;
+                document.getElementById("prof-name").value = userData.fullName || "";
+                document.getElementById("prof-phone").value = userData.phoneNumber || "";
+                document.getElementById("prof-address").value = userData.address || "";
 
+                // Cập nhật thông tin Avatar và Tên trên Sidebar
+                document.getElementById("user-sidebar-name").innerText = userData.fullName || userData.email || "Khách Hàng";
+                document.getElementById("user-sidebar-email").innerText = userData.email || "";
+                
+                let finalUrl = userData.avatarUrl;
+                if (finalUrl && finalUrl.startsWith("/images/")) {
+                    if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
+                        finalUrl = "http://localhost:5218" + finalUrl;
+                    }
+                }
+                console.log("=== FINAL AVATAR URL ===", finalUrl);
+
+                if (finalUrl) {
+                    document.getElementById("user-avatar").src = finalUrl;
+                } else {
+                    document.getElementById("user-avatar").src = "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=200";
+                }
+
+                renderVipCard(userData);
+            }
+
+            // Render giao diện tạm thời từ localStorage trước
+            console.log("=== INITIAL USER FROM LOCAL STORAGE ===", user);
+            updateUI(user);
             await loadOrders();
 
-            // Check if hash points to orders
+            // Đồng bộ thông tin mới nhất từ Backend và cập nhật lại giao diện
+            try {
+                const freshUser = await checkAuthStatus();
+                console.log("=== FRESH USER FROM BACKEND ===", freshUser);
+                if (freshUser) {
+                    updateUI(freshUser);
+                }
+            } catch (e) {
+                console.warn("Lỗi khi đồng bộ thông tin mới nhất:", e);
+            }
+
             if (window.location.hash === "#orders") {
                 switchTab("profile-orders");
             }
@@ -171,13 +316,16 @@
             const phoneNumber = document.getElementById("prof-phone").value.trim();
             const address = document.getElementById("prof-address").value.trim();
 
+            const user = getCurrentUser();
+            const avatarUrl = user ? user.avatarUrl : null;
+
             const box = document.getElementById("alert-box");
             box.classList.add("hidden");
 
             try {
                 const res = await apiFetch("AuthApi/profile", {
                     method: "POST",
-                    body: { fullName, phoneNumber, address }
+                    body: { fullName, phoneNumber, address, avatarUrl }
                 });
                 const data = await res.json();
                 
@@ -186,12 +334,13 @@
                     box.classList.add("bg-green-100", "text-green-700");
                     box.innerText = data.message;
                     
-                    // Update user session cache
-                    const user = getCurrentUser();
                     user.fullName = fullName;
                     user.phoneNumber = phoneNumber;
                     user.address = address;
                     localStorage.setItem("user", JSON.stringify(user));
+                    
+                    document.getElementById("user-sidebar-name").innerText = fullName || user.email || "Khách Hàng";
+                    renderVipCard(user);
                 } else {
                     box.classList.add("bg-rose-100", "text-rose-700");
                     box.innerText = data.message;
@@ -199,6 +348,48 @@
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             } catch (e) {
                 console.error("Profile update error:", e);
+            }
+        }
+
+        async function uploadUserAvatar(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const formData = new FormData();
+            formData.append("file", file);
+
+            const box = document.getElementById("alert-box");
+            box.classList.add("hidden");
+
+            try {
+                const res = await apiFetch("AuthApi/upload-avatar", {
+                    method: "POST",
+                    body: formData
+                });
+                const data = await res.json();
+
+                if (res.ok) {
+                    // Cập nhật UI
+                    let finalUrl = data.url;
+                    if (finalUrl && finalUrl.startsWith("/images/")) {
+                        if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
+                            finalUrl = "http://localhost:5218" + finalUrl;
+                        }
+                    }
+                    document.getElementById("user-avatar").src = finalUrl;
+
+                    // Lưu localStorage
+                    const user = getCurrentUser();
+                    user.avatarUrl = data.url;
+                    localStorage.setItem("user", JSON.stringify(user));
+
+                    showProfileAlert("Cập nhật ảnh đại diện thành công!", "success");
+                } else {
+                    showProfileAlert(data.message || "Tải ảnh lên thất bại.", "error");
+                }
+            } catch (e) {
+                console.error("Upload avatar error:", e);
+                showProfileAlert("Lỗi kết nối máy chủ khi tải ảnh đại diện.", "error");
             }
         }
 
@@ -319,6 +510,174 @@
             modal.classList.add("hidden");
             modal.classList.remove("flex");
         }
+
+        // ================= MEMBERSHIP VIP CARD RENDER =================
+        function renderVipCard(user) {
+            if (!user) return;
+            const points = user.points || 0;
+            const fullName = user.fullName || user.email || "Khách Hàng";
+            
+            const vipCard = document.getElementById("vip-card");
+            const tierLabel = document.getElementById("membership-tier-label");
+            const crown = document.getElementById("membership-crown");
+            const cardName = document.getElementById("vip-card-name");
+            const cardPoints = document.getElementById("vip-card-points");
+            const progressLabel = document.getElementById("tier-next-progress-label");
+            const progressBar = document.getElementById("tier-progress-bar");
+            const hint = document.getElementById("tier-next-hint");
+
+            if (!vipCard) return;
+
+            cardName.innerText = fullName;
+            cardPoints.innerText = points + " PTS";
+
+            // Generate user specific card number based on email hash
+            let hash = 0;
+            for (let i = 0; i < user.email.length; i++) {
+                hash = user.email.charCodeAt(i) + ((hash << 5) - hash);
+            }
+            const formattedId = Math.abs(hash).toString().substring(0, 4).padStart(4, "0");
+            document.getElementById("vip-card-number").innerText = `DMT-8888-${formattedId}`;
+
+            vipCard.className = "relative overflow-hidden rounded-3xl p-6 text-white shadow-xl transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl";
+
+            let tierName = "SILVER MEMBER";
+            let nextTierPoints = 500;
+            let barPercent = 0;
+            let hintText = "";
+            if (points < 500) {
+                vipCard.classList.add("bg-gradient-to-br", "from-slate-600", "via-slate-700", "to-slate-800");
+                tierName = "SILVER MEMBER";
+                nextTierPoints = 500;
+                barPercent = (points / 500) * 100;
+                hintText = `Tích lũy thêm ${500 - points} điểm để thăng hạng thành viên Vàng (Gold) và nhận nhiều ưu đãi hơn.`;
+                crown.className = "text-slate-300 text-lg";
+            } else if (points >= 500 && points < 1500) {
+                vipCard.classList.add("bg-gradient-to-br", "from-amber-400", "via-yellow-500", "to-amber-600");
+                tierName = "GOLD MEMBER";
+                nextTierPoints = 1500;
+                barPercent = ((points - 500) / 1000) * 100;
+                hintText = `Tích lũy thêm ${1500 - points} điểm để thăng hạng thành viên Kim Cương (Platinum) - miễn phí ship, giảm thêm 5%.`;
+                crown.className = "text-yellow-300 text-lg animate-bounce";
+            } else {
+                vipCard.classList.add("bg-gradient-to-br", "from-indigo-500", "via-purple-600", "to-pink-500");
+                tierName = "PLATINUM MEMBER";
+                barPercent = 100;
+                hintText = "Chúc mừng! Bạn đã đạt cấp bậc thành viên Kim Cương cao nhất với các đặc quyền ưu đãi tối cao.";
+                crown.className = "text-pink-300 text-xl animate-pulse";
+            }
+
+            tierLabel.innerText = tierName;
+            
+            if (points >= 1500) {
+                progressLabel.innerText = `${points} PTS`;
+                progressBar.style.width = "100%";
+                progressBar.className = "bg-gradient-to-r from-pink-500 to-yellow-400 h-2 rounded-full transition-all duration-500";
+            } else {
+                progressLabel.innerText = `${points}/${nextTierPoints} PTS`;
+                progressBar.style.width = `${barPercent}%`;
+                progressBar.className = "bg-indigo-600 h-2 rounded-full transition-all duration-500";
+            }
+            hint.innerText = hintText;
+        }
+
+        // ================= LOYALTY VOUCHER REDEEM =================
+        async function redeemVoucher(type) {
+            const user = getCurrentUser();
+            if (!user) return;
+
+            let pointsCost = type === "50K" ? 500 : 1000;
+            if ((user.points || 0) < pointsCost) {
+                showProfileAlert(`Bạn không đủ điểm để đổi voucher này! Hiện tại bạn có ${user.points || 0} điểm, cần ${pointsCost} điểm.`, "error");
+                return;
+            }
+
+            if (!confirm(`Bạn có chắc chắn muốn đổi ${pointsCost} điểm lấy Voucher ${type} không?`)) return;
+
+            try {
+                const res = await apiFetch("AuthApi/redeem-voucher", {
+                    method: "POST",
+                    body: { voucherType: type }
+                });
+                const data = await res.json();
+                
+                if (res.ok) {
+                    user.points = data.points;
+                    localStorage.setItem("user", JSON.stringify(user));
+                    
+                    renderVipCard(user);
+                    showRedemptionSuccessModal(type, data.voucherCode);
+                } else {
+                    showProfileAlert(data.message || "Đổi quà thất bại.", "error");
+                }
+            } catch (e) {
+                console.error("Redeem voucher failed:", e);
+                showProfileAlert("Đã xảy ra lỗi kết nối.", "error");
+            }
+        }
+
+        function showRedemptionSuccessModal(type, code) {
+            document.getElementById("redeem-value-label").innerText = type;
+            document.getElementById("redeem-code-label").innerText = code;
+            
+            const modal = document.getElementById("redemption-modal");
+            modal.classList.remove("hidden");
+            modal.classList.add("flex");
+        }
+
+        function closeRedemptionModal() {
+            const modal = document.getElementById("redemption-modal");
+            modal.classList.add("hidden");
+            modal.classList.remove("flex");
+        }
+
+        function copyRedeemCode() {
+            const code = document.getElementById("redeem-code-label").innerText;
+            navigator.clipboard.writeText(code).then(() => {
+                alert("Đã sao chép mã giảm giá vào bộ nhớ tạm!");
+            }).catch(err => {
+                console.error("Copy failed", err);
+            });
+        }
+
+        function showProfileAlert(message, type) {
+            const box = document.getElementById("alert-box");
+            if (!box) return;
+            box.classList.remove("hidden", "bg-rose-100", "text-rose-700", "bg-green-100", "text-green-700");
+            
+            if (type === "success") {
+                box.classList.add("bg-green-100", "text-green-700");
+            } else {
+                box.classList.add("bg-rose-100", "text-rose-700");
+            }
+            box.innerText = message;
+            box.classList.remove("hidden");
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            setTimeout(() => {
+                box.classList.add("hidden");
+            }, 5000);
+        }
     </script>
+
+    <!-- Redemption Success Modal -->
+    <div id="redemption-modal" class="fixed inset-0 bg-black/60 hidden z-50 items-center justify-center p-4">
+        <div class="bg-white border border-gray-200 rounded-3xl w-full max-w-sm overflow-hidden shadow-2xl p-6 text-center space-y-4">
+            <div class="w-16 h-16 bg-green-50 text-green-500 rounded-full flex items-center justify-center mx-auto text-3xl">
+                <i class="fa-solid fa-gift"></i>
+            </div>
+            <h3 class="font-black text-base text-gray-800">Đổi Quà Thành Công!</h3>
+            <p class="text-xs text-gray-500">Mã giảm giá <span id="redeem-value-label" class="font-bold text-indigo-600">50K</span> của bạn đã được tạo.</p>
+            
+            <div class="bg-gray-50 border border-dashed border-indigo-300 p-3 rounded-2xl flex justify-between items-center my-4">
+                <span id="redeem-code-label" class="font-mono font-bold text-sm tracking-wider text-gray-800">DMT-50K-XXXXXX</span>
+                <button onclick="copyRedeemCode()" class="text-indigo-600 hover:text-indigo-800 font-bold text-xs"><i class="fa-regular fa-copy"></i> Copy</button>
+            </div>
+            
+            <p class="text-[10px] text-gray-400">Bạn có thể áp dụng mã này ở bước thanh toán (Checkout).</p>
+            
+            <button onclick="closeRedemptionModal()" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-750 text-white rounded-full text-xs font-bold transition shadow-lg shadow-indigo-100">Đóng</button>
+        </div>
+    </div>
 </body>
 </html>

@@ -8,6 +8,8 @@ namespace ClothingShop.Domain.Entities
     {
         public string FullName { get; set; }
         public string Address { get; set; }
+        public int Points { get; set; } = 0;
+        public string? AvatarUrl { get; set; }
         public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
 
         // Navigation properties

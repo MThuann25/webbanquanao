@@ -15,6 +15,49 @@ namespace ClothingShop.Infrastructure.Data
             // Ensure database is created
             await context.Database.EnsureCreatedAsync();
 
+            // Tu dong cap nhat cot Points trong SQL Server neu chua co
+            try
+            {
+                if (context.Database.IsSqlServer())
+                {
+                    await context.Database.ExecuteSqlRawAsync(@"
+                        IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('dbo.AspNetUsers') AND name = 'Points')
+                        BEGIN
+                            ALTER TABLE dbo.AspNetUsers ADD Points INT NOT NULL DEFAULT 0;
+                        END
+                    ");
+                }
+            }
+            catch (Exception)
+            {
+                // Bo qua loi
+            }
+
+            // Tu dong cap nhat cot AvatarUrl trong SQL Server hoac Postgres neu chua co
+            try
+            {
+                if (context.Database.IsSqlServer())
+                {
+                    await context.Database.ExecuteSqlRawAsync(@"
+                        IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('dbo.AspNetUsers') AND name = 'AvatarUrl')
+                        BEGIN
+                            ALTER TABLE dbo.AspNetUsers ADD AvatarUrl NVARCHAR(500) NULL;
+                        END
+                    ");
+                }
+                else
+                {
+                    // Neon PostgreSQL (Postgres 9.6+ ho tro ADD COLUMN IF NOT EXISTS)
+                    await context.Database.ExecuteSqlRawAsync(@"
+                        ALTER TABLE ""AspNetUsers"" ADD COLUMN IF NOT EXISTS ""AvatarUrl"" text NULL;
+                    ");
+                }
+            }
+            catch (Exception)
+            {
+                // Bo qua loi
+            }
+
             // 1. Seed Roles
             string[] roleNames = { "Admin", "User" };
             foreach (var roleName in roleNames)
