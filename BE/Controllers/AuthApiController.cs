@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
@@ -62,6 +63,8 @@ namespace ClothingShop.Web.Controllers
                         id = user.Id,
                         email = user.Email,
                         fullName = user.FullName,
+                        avatarUrl = user.AvatarUrl,
+                        points = user.Points,
                         roles = roles
                     }
                 });
@@ -109,6 +112,8 @@ namespace ClothingShop.Web.Controllers
                         id = user.Id,
                         email = user.Email,
                         fullName = user.FullName,
+                        avatarUrl = user.AvatarUrl,
+                        points = user.Points,
                         roles = new[] { "User" }
                     }
                 });
@@ -145,6 +150,8 @@ namespace ClothingShop.Web.Controllers
                             fullName = user.FullName,
                             phoneNumber = user.PhoneNumber,
                             address = user.Address,
+                            points = user.Points,
+                            avatarUrl = user.AvatarUrl,
                             roles = roles
                         }
                     });
@@ -165,6 +172,10 @@ namespace ClothingShop.Web.Controllers
             user.FullName = model.FullName;
             user.PhoneNumber = model.PhoneNumber;
             user.Address = model.Address;
+            if (!string.IsNullOrEmpty(model.AvatarUrl))
+            {
+                user.AvatarUrl = model.AvatarUrl;
+            }
 
             var result = await _userManager.UpdateAsync(user);
             if (result.Succeeded)
@@ -318,6 +329,109 @@ namespace ClothingShop.Web.Controllers
 
             return Redirect($"{returnUrl}?error={Uri.EscapeDataString("Có lỗi xảy ra khi tạo tài khoản từ Google.")}");
         }
+
+        [HttpPost("redeem-voucher")]
+        [Authorize]
+        public async Task<IActionResult> RedeemVoucher([FromBody] RedeemVoucherDto model)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null) return NotFound(new { message = "Không tìm thấy người dùng." });
+
+            int pointsCost = 0;
+            decimal discountAmount = 0;
+            string valueLabel = "";
+
+            if (model.VoucherType == "50K")
+            {
+                pointsCost = 500;
+                discountAmount = 50000;
+                valueLabel = "50K";
+            }
+            else if (model.VoucherType == "100K")
+            {
+                pointsCost = 1000;
+                discountAmount = 100000;
+                valueLabel = "100K";
+            }
+            else
+            {
+                return BadRequest(new { message = "Loại quà tặng không hợp lệ." });
+            }
+
+            if (user.Points < pointsCost)
+            {
+                return BadRequest(new { message = $"Bạn không đủ điểm để đổi quà tặng này. Cần {pointsCost} điểm, bạn hiện có {user.Points} điểm." });
+            }
+
+            user.Points -= pointsCost;
+            var updateResult = await _userManager.UpdateAsync(user);
+            if (!updateResult.Succeeded)
+            {
+                return BadRequest(new { message = "Lỗi khi cập nhật điểm tích lũy." });
+            }
+
+            var randomCode = "DMT-" + valueLabel + "-" + Guid.NewGuid().ToString().Substring(0, 6).ToUpper();
+            
+            var voucher = new Voucher
+            {
+                Code = randomCode,
+                DiscountPercent = null,
+                DiscountAmount = discountAmount,
+                ExpiryDate = DateTime.UtcNow.AddDays(30),
+                UsageLimit = 1,
+                UsedCount = 0
+            };
+
+            await _unitOfWork.Repository<Voucher>().AddAsync(voucher);
+            await _unitOfWork.SaveChangesAsync();
+
+            return Ok(new
+            {
+                message = $"Đổi quà tặng thành công! Mã Voucher của bạn là: {randomCode}",
+                voucherCode = randomCode,
+                points = user.Points
+            });
+        }
+
+        [HttpPost("upload-avatar")]
+        [Authorize]
+        public async Task<IActionResult> UploadAvatar(IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+                return BadRequest(new { message = "Không tìm thấy file hợp lệ." });
+
+            var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "avatars");
+            if (!Directory.Exists(uploadsFolder))
+            {
+                Directory.CreateDirectory(uploadsFolder);
+            }
+
+            var uniqueFileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(file.FileName);
+            var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await file.CopyToAsync(stream);
+            }
+
+            var url = $"/images/avatars/{uniqueFileName}";
+
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user != null)
+            {
+                user.AvatarUrl = url;
+                await _userManager.UpdateAsync(user);
+            }
+
+            return Ok(new { url = url, message = "Tải ảnh đại diện lên thành công!" });
+        }
+    }
+
+    public class RedeemVoucherDto
+    {
+        public string VoucherType { get; set; } = null!;
     }
 
     public class LoginDto
@@ -342,6 +456,7 @@ namespace ClothingShop.Web.Controllers
         public string FullName { get; set; } = null!;
         public string PhoneNumber { get; set; } = null!;
         public string Address { get; set; } = null!;
+        public string? AvatarUrl { get; set; }
     }
 
     public class CartItemInput

@@ -23,7 +23,7 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
     "Server=(localdb)\\mssqllocaldb;Database=ClothingShopDB;Trusted_Connection=True;MultipleActiveResultSets=true";
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(connectionString));
+    options.UseNpgsql(connectionString));
 
 // 2. Configure Identity
 builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>

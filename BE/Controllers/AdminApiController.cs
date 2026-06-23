@@ -11,6 +11,9 @@ using ClothingShop.Domain.Interfaces;
 using System.IO;
 using Microsoft.AspNetCore.Http;
 
+using Microsoft.AspNetCore.Identity;
+using System.Security.Claims;
+
 namespace ClothingShop.Web.Controllers
 {
     [ApiController]
@@ -23,19 +26,25 @@ namespace ClothingShop.Web.Controllers
         private readonly CategoryService _categoryService;
         private readonly BrandService _brandService;
         private readonly VoucherService _voucherService;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly RoleManager<ApplicationRole> _roleManager;
 
         public AdminApiController(
             IUnitOfWork unitOfWork,
             ProductService productService,
             CategoryService categoryService,
             BrandService brandService,
-            VoucherService voucherService)
+            VoucherService voucherService,
+            UserManager<ApplicationUser> userManager,
+            RoleManager<ApplicationRole> roleManager)
         {
             _unitOfWork = unitOfWork;
             _productService = productService;
             _categoryService = categoryService;
             _brandService = brandService;
             _voucherService = voucherService;
+            _userManager = userManager;
+            _roleManager = roleManager;
         }
 
         // ================= DASHBOARD =================
@@ -470,6 +479,8 @@ namespace ClothingShop.Web.Controllers
             var order = await _unitOfWork.Repository<Order>().GetByIdAsync(id);
             if (order == null) return NotFound(new { message = "Không tìm thấy đơn hàng." });
 
+            string oldStatus = order.Status;
+
             if (!string.IsNullOrEmpty(model.Status))
             {
                 order.Status = model.Status;
@@ -486,8 +497,145 @@ namespace ClothingShop.Web.Controllers
             _unitOfWork.Repository<Order>().Update(order);
             await _unitOfWork.SaveChangesAsync();
 
+            // Tich diem cho khach hang khi don hang chuyen sang "Hoan thanh"
+            if (model.Status == "Hoàn thành" && oldStatus != "Hoàn thành")
+            {
+                var user = await _userManager.FindByIdAsync(order.UserId);
+                if (user != null)
+                {
+                    int pointsEarned = (int)(order.TotalAmount / 10000);
+                    user.Points += pointsEarned;
+                    await _userManager.UpdateAsync(user);
+                }
+            }
+
             return Ok(new { message = "Cập nhật trạng thái đơn hàng thành công!" });
         }
+
+        // ================= USERS MANAGEMENT =================
+        [HttpGet("users")]
+        public async Task<IActionResult> GetUsers()
+        {
+            var users = await _userManager.Users.ToListAsync();
+            var result = new List<object>();
+            foreach (var u in users)
+            {
+                var roles = await _userManager.GetRolesAsync(u);
+                result.Add(new
+                {
+                    id = u.Id,
+                    email = u.Email,
+                    fullName = u.FullName,
+                    address = u.Address,
+                    phoneNumber = u.PhoneNumber,
+                    createdDate = u.CreatedDate.ToString("dd/MM/yyyy HH:mm"),
+                    isLocked = u.LockoutEnd.HasValue && u.LockoutEnd > DateTimeOffset.UtcNow,
+                    roles = roles
+                });
+            }
+            return Ok(result);
+        }
+
+        [HttpPost("users/{id}/toggle-lock")]
+        public async Task<IActionResult> ToggleLockUser(string id)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null) return NotFound(new { message = "Không tìm thấy người dùng." });
+
+            var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (user.Id == currentUserId)
+            {
+                return BadRequest(new { message = "Bạn không thể tự khóa tài khoản của chính mình." });
+            }
+
+            bool isCurrentlyLocked = user.LockoutEnd.HasValue && user.LockoutEnd > DateTimeOffset.UtcNow;
+            if (isCurrentlyLocked)
+            {
+                await _userManager.SetLockoutEndDateAsync(user, null);
+            }
+            else
+            {
+                await _userManager.SetLockoutEndDateAsync(user, DateTimeOffset.UtcNow.AddYears(100));
+            }
+
+            return Ok(new { message = isCurrentlyLocked ? "Mở khóa tài khoản thành công!" : "Khóa tài khoản thành công!" });
+        }
+
+        [HttpPut("users/{id}/role")]
+        public async Task<IActionResult> ChangeUserRole(string id, [FromBody] UserRoleUpdateDto model)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null) return NotFound(new { message = "Không tìm thấy người dùng." });
+
+            var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (user.Id == currentUserId)
+            {
+                return BadRequest(new { message = "Bạn không thể tự thay đổi vai trò của chính mình." });
+            }
+
+            if (string.IsNullOrEmpty(model.Role))
+            {
+                return BadRequest(new { message = "Vai trò không hợp lệ." });
+            }
+
+            if (!await _roleManager.RoleExistsAsync(model.Role))
+            {
+                return BadRequest(new { message = $"Vai trò '{model.Role}' không tồn tại trong hệ thống." });
+            }
+
+            var currentRoles = await _userManager.GetRolesAsync(user);
+            
+            var removeResult = await _userManager.RemoveFromRolesAsync(user, currentRoles);
+            if (!removeResult.Succeeded)
+            {
+                return BadRequest(new { message = "Có lỗi xảy ra khi xóa các vai trò cũ." });
+            }
+
+            var addResult = await _userManager.AddToRoleAsync(user, model.Role);
+            if (!addResult.Succeeded)
+            {
+                return BadRequest(new { message = "Có lỗi xảy ra khi gán vai trò mới." });
+            }
+
+            return Ok(new { message = "Thay đổi quyền hạn tài khoản thành công!" });
+        }
+
+        [HttpDelete("users/{id}")]
+        public async Task<IActionResult> DeleteUser(string id)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null) return NotFound(new { message = "Không tìm thấy người dùng." });
+
+            var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (user.Id == currentUserId)
+            {
+                return BadRequest(new { message = "Bạn không thể tự xóa tài khoản của chính mình." });
+            }
+
+            try
+            {
+                var result = await _userManager.DeleteAsync(user);
+                if (result.Succeeded)
+                {
+                    return Ok(new { message = "Xóa tài khoản thành công!" });
+                }
+                var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+                return BadRequest(new { message = "Không thể xóa tài khoản: " + errors });
+            }
+            catch (DbUpdateException)
+            {
+                return BadRequest(new { message = "Không thể xóa tài khoản này vì đã phát sinh đơn hàng hoặc giao dịch. Vui lòng sử dụng tính năng Khóa tài khoản để vô hiệu hóa." });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = "Lỗi hệ thống: " + ex.Message });
+            }
+        }
+    }
+
+    public class UserRoleUpdateDto
+    {
+        public string Role { get; set; } = null!;
     }
 
     // DTOs

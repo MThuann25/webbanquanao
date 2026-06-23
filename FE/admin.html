@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
@@ -34,7 +34,7 @@
 
     <!-- Top Admin Header -->
     <header class="bg-gray-900 text-white py-4 px-6 sm:px-8 flex justify-between items-center shadow-lg border-b border-gray-800">
-        <a href="index.html" class="text-xl font-black tracking-wider text-white">CLOTHINGSHOP <span class="text-indigo-400 text-xs font-bold uppercase ml-2 px-2 py-0.5 border border-indigo-400 rounded-full">ADMIN PORTAL</span></a>
+        <a href="index.html" class="text-xl font-black tracking-wider text-white">DMTShop <span class="text-indigo-400 text-xs font-bold uppercase ml-2 px-2 py-0.5 border border-indigo-400 rounded-full">ADMIN PORTAL</span></a>
         
         <div class="flex items-center space-x-4">
             <span id="admin-name" class="text-xs font-bold text-gray-300">Admin</span>
@@ -70,6 +70,10 @@
             <button onclick="switchAdminTab('comments')" id="admin-tab-btn-comments" class="admin-tab-btn w-full px-4 py-2.5 text-left text-xs font-bold rounded-xl transition text-gray-500 hover:bg-gray-50 flex items-center space-x-2">
                 <i class="fa-regular fa-comment-dots text-sm"></i>
                 <span>Duyệt bình luận</span>
+            </button>
+            <button onclick="switchAdminTab('users')" id="admin-tab-btn-users" class="admin-tab-btn w-full px-4 py-2.5 text-left text-xs font-bold rounded-xl transition text-gray-500 hover:bg-gray-50 flex items-center space-x-2">
+                <i class="fa-solid fa-users-gear text-sm"></i>
+                <span>Quản lý khách hàng</span>
             </button>
         </aside>
 
@@ -266,6 +270,33 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Tab: Users Management -->
+            <div id="admin-tab-users" class="admin-tab-content hidden space-y-6">
+                <div class="bg-white p-4 border border-gray-150 rounded-2xl shadow-sm">
+                    <h3 class="font-bold text-xs uppercase text-gray-400 tracking-wider">Danh sách tài khoản khách hàng</h3>
+                </div>
+
+                <div class="bg-white rounded-3xl border border-gray-150 shadow-sm overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-100 text-xs text-left">
+                            <thead class="bg-gray-50 uppercase text-[9px] font-bold text-gray-400 tracking-wider">
+                                <tr>
+                                    <th class="px-6 py-3">Họ Tên</th>
+                                    <th class="px-6 py-3">Email</th>
+                                    <th class="px-6 py-3">Ngày Tạo</th>
+                                    <th class="px-6 py-3">Vai Trò</th>
+                                    <th class="px-6 py-3">Trạng Thái</th>
+                                    <th class="px-6 py-3 text-right">Thao Tác</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admin-users-tbody" class="divide-y divide-gray-100">
+                                <!-- Loaded dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </main>
     </div>
 
@@ -411,6 +442,7 @@
             await loadVouchersData();
             await loadCategoriesBrands();
             await loadReviewsData();
+            await loadUsersData();
         });
 
         function switchAdminTab(tabId) {
@@ -1034,6 +1066,115 @@
                     await loadReviewsData();
                 }
             } catch (e) {}
+        }
+
+        // ================= USERS MANAGEMENT =================
+        async function loadUsersData() {
+            const tbody = document.getElementById("admin-users-tbody");
+            if (!tbody) return;
+            tbody.innerHTML = `<tr><td colspan="6" class="px-6 py-4 text-center text-gray-400">Đang tải danh sách tài khoản...</td></tr>`;
+
+            try {
+                const res = await apiFetch("AdminApi/users");
+                if (res.ok) {
+                    const data = await res.json();
+                    tbody.innerHTML = "";
+                    const currentUser = getCurrentUser();
+
+                    data.forEach(u => {
+                        const isSelf = currentUser && currentUser.email === u.email;
+                        const roleOptions = `
+                            <select onchange="changeUserRole('${u.id}', this.value)" ${isSelf ? 'disabled' : ''} class="px-2 py-1 bg-white border border-gray-250 rounded-lg text-xxs font-bold text-gray-700">
+                                <option value="User" ${u.roles.includes("User") && !u.roles.includes("Admin") ? "selected" : ""}>Khách Hàng (User)</option>
+                                <option value="Admin" ${u.roles.includes("Admin") ? "selected" : ""}>Quản Trị Viên (Admin)</option>
+                            </select>
+                        `;
+
+                        const statusText = u.isLocked 
+                            ? `<span class="px-2.5 py-1 rounded-full text-xxs font-bold bg-rose-100 text-rose-700">Đang Khóa</span>` 
+                            : `<span class="px-2.5 py-1 rounded-full text-xxs font-bold bg-emerald-100 text-emerald-700">Hoạt Động</span>`;
+
+                        const actions = isSelf 
+                            ? `<span class="text-gray-400 font-semibold italic text-xxs">Tài khoản của bạn</span>` 
+                            : `
+                                <button onclick="toggleLockUser('${u.id}')" class="text-amber-600 hover:text-amber-800 font-semibold mr-3">
+                                    <i class="fa-solid ${u.isLocked ? 'fa-lock-open' : 'fa-lock'}"></i> ${u.isLocked ? 'Mở Khóa' : 'Khóa'}
+                                </button>
+                                <button onclick="deleteUser('${u.id}')" class="text-rose-600 hover:text-rose-800 font-semibold">
+                                    <i class="fa-regular fa-trash-can"></i> Xóa
+                                </button>
+                            `;
+
+                        tbody.innerHTML += `
+                            <tr>
+                                <td class="px-6 py-4 font-bold text-gray-805">${u.fullName || "-"}</td>
+                                <td class="px-6 py-4 text-gray-500 font-mono">${u.email}</td>
+                                <td class="px-6 py-4 text-gray-500">${u.createdDate}</td>
+                                <td class="px-6 py-4">${roleOptions}</td>
+                                <td class="px-6 py-4">${statusText}</td>
+                                <td class="px-6 py-4 text-right space-x-2">${actions}</td>
+                            </tr>
+                        `;
+                    });
+                }
+            } catch (e) {
+                console.error("Users table loading error:", e);
+                tbody.innerHTML = `<tr><td colspan="6" class="px-6 py-4 text-center text-red-500">Lỗi khi tải dữ liệu người dùng.</td></tr>`;
+            }
+        }
+
+        async function toggleLockUser(userId) {
+            try {
+                const res = await apiFetch(`AdminApi/users/${userId}/toggle-lock`, { method: "POST" });
+                const data = await res.json();
+                if (res.ok) {
+                    showAdminAlert(data.message, "success");
+                    await loadUsersData();
+                    await loadDashboardData();
+                } else {
+                    showAdminAlert(data.message || "Không thể thực hiện thao tác.", "error");
+                }
+            } catch (e) {
+                console.error("Toggle user lock failed:", e);
+                showAdminAlert("Đã xảy ra lỗi kết nối.", "error");
+            }
+        }
+
+        async function changeUserRole(userId, role) {
+            try {
+                const res = await apiFetch(`AdminApi/users/${userId}/role`, {
+                    method: "PUT",
+                    body: { role }
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    showAdminAlert(data.message, "success");
+                    await loadUsersData();
+                } else {
+                    showAdminAlert(data.message || "Không thể đổi vai trò.", "error");
+                }
+            } catch (e) {
+                console.error("Change user role failed:", e);
+                showAdminAlert("Đã xảy ra lỗi kết nối.", "error");
+            }
+        }
+
+        async function deleteUser(userId) {
+            if (!confirm("Bạn có chắc chắn muốn xóa tài khoản này? Việc này không thể hoàn tác!")) return;
+            try {
+                const res = await apiFetch(`AdminApi/users/${userId}`, { method: "DELETE" });
+                const data = await res.json();
+                if (res.ok) {
+                    showAdminAlert(data.message, "success");
+                    await loadUsersData();
+                    await loadDashboardData();
+                } else {
+                    showAdminAlert(data.message || "Lỗi khi xóa tài khoản.", "error");
+                }
+            } catch (e) {
+                console.error("Delete user failed:", e);
+                showAdminAlert("Đã xảy ra lỗi kết nối.", "error");
+            }
         }
 
         // Alert helper

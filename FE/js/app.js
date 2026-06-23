@@ -151,16 +151,86 @@ async function updateCartCountBadge() {
     badge.style.display = count > 0 ? "flex" : "none";
 }
 
+// ====================================================
+// Logo Typewriter Animation - DMTShop
+// ====================================================
+function startLogoTypewriter() {
+    const logoText = document.getElementById('dmt-logo-text');
+    const cursor = document.getElementById('dmt-cursor');
+    if (!logoText || !cursor) return;
+
+    // Neu da chay roi thi bo qua
+    if (logoText.dataset.typed === '1') return;
+    logoText.dataset.typed = '1';
+
+    const fullText = 'DMTShop';
+    let i = 0;
+
+    function typeChar() {
+        if (i < fullText.length) {
+            logoText.textContent += fullText[i];
+            i++;
+            setTimeout(typeChar, 115);
+        } else {
+            // Gõ xong: kích hoạt glow và ẩn cursor sau 1.5s
+            setTimeout(() => {
+                logoText.classList.add('dmt-glow-active');
+                setTimeout(() => { cursor.style.opacity = '0'; }, 1200);
+            }, 300);
+        }
+    }
+
+    setTimeout(typeChar, 350);
+}
+
 // Global UI Rendering Helpers
 function injectHeader() {
     const headerHtml = `
+    <style>
+    #dmt-logo-text {
+        background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #c026d3 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        font-family: 'Times New Roman', Times, serif;
+        letter-spacing: 0.05em;
+        transition: filter 0.4s ease;
+    }
+    #dmt-logo-text.dmt-glow-active {
+        animation: dmtGlowPulse 2.5s ease-in-out infinite alternate;
+        filter: drop-shadow(0 0 8px rgba(124,58,237,0.6));
+    }
+    #dmt-cursor {
+        color: #7c3aed;
+        font-weight: 100;
+        font-size: 1.5rem;
+        line-height: 1;
+        animation: dmtCursorBlink 0.65s step-end infinite;
+        transition: opacity 0.6s ease;
+        display: inline-block;
+        margin-left: 1px;
+    }
+    @keyframes dmtCursorBlink {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0; }
+    }
+    @keyframes dmtGlowPulse {
+        from { filter: drop-shadow(0 0 5px rgba(79,70,229,0.45)); }
+        to   { filter: drop-shadow(0 0 16px rgba(192,38,211,0.85)); }
+    }
+    #dmt-logo-link:hover #dmt-logo-text {
+        transform: scale(1.04);
+        filter: drop-shadow(0 0 18px rgba(124,58,237,0.9)) !important;
+    }
+    #dmt-logo-link { transition: transform 0.2s ease; display: flex; align-items: center; }
+    </style>
     <header class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100 transition-all duration-300">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
-                <!-- Logo -->
+                <!-- Logo DMTShop Animated -->
                 <div class="flex-shrink-0">
-                    <a href="index.html" class="flex items-center space-x-2">
-                        <span class="text-2xl font-black tracking-wider bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent">CLOTHINGSHOP</span>
+                    <a href="index.html" id="dmt-logo-link">
+                        <span id="dmt-logo-text" class="text-2xl font-black"></span><span id="dmt-cursor">|</span>
                     </a>
                 </div>
                 
@@ -189,9 +259,7 @@ function injectHeader() {
     </header>
     `;
     
-    const wrapper = document.createElement("div");
-    wrapper.innerHTML = headerHtml;
-    document.body.prepend(wrapper.firstElementChild);
+    document.body.insertAdjacentHTML('afterbegin', headerHtml);
     
     // Update Auth buttons
     const user = getCurrentUser();
@@ -207,7 +275,6 @@ function injectHeader() {
                 <div class="absolute right-0 w-48 mt-1 origin-top-right bg-white rounded-xl shadow-xl border border-gray-100 divide-y divide-gray-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition duration-150 z-50">
                     <div class="py-1">
                         <a href="profile.html" class="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50"><i class="fa-regular fa-id-card mr-2 text-gray-400"></i>Hồ sơ của tôi</a>
-                        <a href="profile.html#orders" class="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50"><i class="fa-solid fa-receipt mr-2 text-gray-400"></i>Lịch sử đơn hàng</a>
                         ${isAdmin ? `<a href="admin.html" class="flex items-center px-4 py-2.5 text-sm text-rose-600 hover:bg-gray-50 font-medium"><i class="fa-solid fa-user-gear mr-2 text-rose-400"></i>Trang quản trị</a>` : ""}
                     </div>
                     <div class="py-1">
@@ -233,7 +300,7 @@ function injectFooter() {
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
                 <div class="md:col-span-2">
-                    <span class="text-2xl font-black tracking-wider text-white bg-gradient-to-r from-indigo-400 to-violet-400 bg-clip-text text-transparent">CLOTHINGSHOP</span>
+                    <span class="text-2xl font-black tracking-wider" style="background:linear-gradient(135deg,#818cf8,#a78bfa,#e879f9);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-family:'Times New Roman',Times,serif;">DMTShop</span>
                     <p class="mt-4 text-sm leading-relaxed max-w-sm text-gray-400">Website mua sắm thời trang trực tuyến hàng đầu Việt Nam. Cung cấp các sản phẩm chất lượng cao với xu hướng thiết kế mới nhất.</p>
                 </div>
                 <div>
@@ -499,6 +566,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Inject components
     injectHeader();
     injectFooter();
+    // Khởi động typewriter logo
+    startLogoTypewriter();
     
     // Load SignalR library and inject chatbox
     const script = document.createElement("script");
