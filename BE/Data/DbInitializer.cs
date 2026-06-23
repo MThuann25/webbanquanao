@@ -193,7 +193,7 @@ namespace ClothingShop.Infrastructure.Data
             }
 
             // 4.5. Seed 50 Random Products
-            if (await context.Products.CountAsync() < 50)
+            if (!await context.Products.AnyAsync())
             {
                 var allCategories = await context.Categories.ToListAsync();
                 var allBrands = await context.Brands.ToListAsync();

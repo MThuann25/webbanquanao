@@ -152,77 +152,89 @@ async function updateCartCountBadge() {
 }
 
 // ====================================================
-// Logo Typewriter Animation - DMTShop
+// Logo Typewriter Animation - DMTShop (Deprecated in favor of premium CSS SVG draw)
 // ====================================================
 function startLogoTypewriter() {
-    const logoText = document.getElementById('dmt-logo-text');
-    const cursor = document.getElementById('dmt-cursor');
-    if (!logoText || !cursor) return;
-
-    // Neu da chay roi thi bo qua
-    if (logoText.dataset.typed === '1') return;
-    logoText.dataset.typed = '1';
-
-    const fullText = 'DMTShop';
-    let i = 0;
-
-    function typeChar() {
-        if (i < fullText.length) {
-            logoText.textContent += fullText[i];
-            i++;
-            setTimeout(typeChar, 115);
-        } else {
-            // Gõ xong: kích hoạt glow và ẩn cursor sau 1.5s
-            setTimeout(() => {
-                logoText.classList.add('dmt-glow-active');
-                setTimeout(() => { cursor.style.opacity = '0'; }, 1200);
-            }, 300);
-        }
-    }
-
-    setTimeout(typeChar, 350);
+    // Không làm gì, đã thay bằng logo SVG vẽ nét premium
 }
 
 // Global UI Rendering Helpers
 function injectHeader() {
     const headerHtml = `
     <style>
-    #dmt-logo-text {
-        background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #c026d3 100%);
+    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;900&display=swap');
+
+    #dmt-logo-link {
+        font-family: 'Outfit', sans-serif;
+        display: flex;
+        align-items: center;
+        text-decoration: none;
+        transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .dmt-logo-icon {
+        stroke-dasharray: 100;
+        stroke-dashoffset: 100;
+        animation: dmtDrawLine 1.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), color 0.4s ease;
+    }
+    @keyframes dmtDrawLine {
+        to {
+            stroke-dashoffset: 0;
+        }
+    }
+    .dmt-logo-bold {
+        font-size: 1.65rem;
+        letter-spacing: -0.03em;
+    }
+    .dmt-logo-bold .dmt-bounce-item {
+        font-weight: 900;
+        background: linear-gradient(120deg, #4f46e5 0%, #7c3aed 50%, #db2777 100%);
+        background-size: 200% 200%;
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
-        font-family: 'Times New Roman', Times, serif;
-        letter-spacing: 0.05em;
+        animation: dmtGradientShift 5s ease infinite, dmtWaveBounce 4.5s ease-in-out infinite;
         transition: filter 0.4s ease;
     }
-    #dmt-logo-text.dmt-glow-active {
-        animation: dmtGlowPulse 2.5s ease-in-out infinite alternate;
-        filter: drop-shadow(0 0 8px rgba(124,58,237,0.6));
-    }
-    #dmt-cursor {
-        color: #7c3aed;
-        font-weight: 100;
-        font-size: 1.5rem;
-        line-height: 1;
-        animation: dmtCursorBlink 0.65s step-end infinite;
-        transition: opacity 0.6s ease;
-        display: inline-block;
+    .dmt-logo-light {
+        font-size: 1.65rem;
         margin-left: 1px;
     }
-    @keyframes dmtCursorBlink {
-        0%, 100% { opacity: 1; }
-        50% { opacity: 0; }
+    .dmt-logo-light .dmt-bounce-item {
+        font-weight: 300;
+        color: #1e293b;
+        animation: dmtWaveBounce 4.5s ease-in-out infinite;
+        transition: color 0.4s ease;
     }
-    @keyframes dmtGlowPulse {
-        from { filter: drop-shadow(0 0 5px rgba(79,70,229,0.45)); }
-        to   { filter: drop-shadow(0 0 16px rgba(192,38,211,0.85)); }
+    @keyframes dmtGradientShift {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
     }
-    #dmt-logo-link:hover #dmt-logo-text {
-        transform: scale(1.04);
-        filter: drop-shadow(0 0 18px rgba(124,58,237,0.9)) !important;
+    .dmt-bounce-item {
+        display: inline-block;
     }
-    #dmt-logo-link { transition: transform 0.2s ease; display: flex; align-items: center; }
+    @keyframes dmtWaveBounce {
+        0%, 15%, 100% {
+            transform: translateY(0);
+        }
+        7.5% {
+            transform: translateY(-8px);
+        }
+    }
+    #dmt-logo-link:hover {
+        transform: translateY(-1px);
+    }
+    #dmt-logo-link:hover .dmt-logo-icon {
+        transform: rotate(-12deg) scale(1.1);
+        color: #db2777;
+    }
+    #dmt-logo-link:hover .dmt-logo-bold .dmt-bounce-item {
+        filter: drop-shadow(0 0 10px rgba(124, 58, 237, 0.5));
+    }
+    #dmt-logo-link:hover .dmt-logo-light .dmt-bounce-item {
+        color: #7c3aed;
+    }
     </style>
     <header class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100 transition-all duration-300">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -230,7 +242,24 @@ function injectHeader() {
                 <!-- Logo DMTShop Animated -->
                 <div class="flex-shrink-0">
                     <a href="index.html" id="dmt-logo-link">
-                        <span id="dmt-logo-text" class="text-2xl font-black"></span><span id="dmt-cursor">|</span>
+                        <!-- SVG Icon Móc áo vẽ nét -->
+                        <span class="dmt-bounce-item" style="animation-delay: 0s;">
+                            <svg class="dmt-logo-icon h-7 w-7 mr-1.5 text-indigo-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M12 2a3 3 0 0 1 3 3c0 .82-.4 1.5-1 2H10c-.6-.5-1-1.18-1-2a3 3 0 0 1 3-3z"/>
+                                <path d="M21 16.5A2.5 2.5 0 0 1 18.5 19H5.5A2.5 2.5 0 0 1 3 16.5c0-1.8 1-3.4 2.5-4.2l6-3.3a1 1 0 0 1 1 0l6 3.3c1.5.8 2.5 2.4 2.5 4.2z"/>
+                            </svg>
+                        </span>
+                        <span class="dmt-logo-bold">
+                            <span class="dmt-bounce-item" style="animation-delay: 0.15s;">D</span>
+                            <span class="dmt-bounce-item" style="animation-delay: 0.3s;">M</span>
+                            <span class="dmt-bounce-item" style="animation-delay: 0.45s;">T</span>
+                        </span>
+                        <span class="dmt-logo-light">
+                            <span class="dmt-bounce-item" style="animation-delay: 0.6s;">S</span>
+                            <span class="dmt-bounce-item" style="animation-delay: 0.75s;">h</span>
+                            <span class="dmt-bounce-item" style="animation-delay: 0.9s;">o</span>
+                            <span class="dmt-bounce-item" style="animation-delay: 1.05s;">p</span>
+                        </span>
                     </a>
                 </div>
                 
