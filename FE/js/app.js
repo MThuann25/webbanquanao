@@ -19,10 +19,13 @@ async function apiFetch(endpoint, options = {}) {
     try {
         const response = await fetch(url, options);
         if (response.status === 401) {
-            // Handle unauthorized - clear local state and redirect to login if not already on login
+            // Handle unauthorized - clear local state
             localStorage.removeItem("user");
-            if (!window.location.pathname.endsWith("login.html") && !window.location.pathname.endsWith("register.html") && !window.location.pathname.endsWith("index.html") && !window.location.pathname.endsWith("shop.html") && !window.location.pathname.endsWith("detail.html") && !window.location.pathname.endsWith("cart.html")) {
-                window.location.href = "login.html";
+            const publicPages = ["login.html", "register.html", "index.html", "shop.html", "detail.html"];
+            const isPublic = publicPages.some(p => window.location.pathname.endsWith(p));
+            if (!isPublic) {
+                const returnUrl = encodeURIComponent(window.location.pathname + window.location.search);
+                window.location.href = `login.html?returnUrl=${returnUrl}`;
             }
         }
         return response;
@@ -59,181 +62,91 @@ async function checkAuthStatus() {
     return null;
 }
 
-// Cart Management (LocalStorage for Guest, API for User)
-const LOCAL_CART_KEY = "GuestCart";
-
-function getLocalCart() {
-    const data = localStorage.getItem(LOCAL_CART_KEY);
-    return data ? JSON.parse(data) : [];
-}
-
-function saveLocalCart(cart) {
-    localStorage.setItem(LOCAL_CART_KEY, JSON.stringify(cart));
-    updateCartCountBadge();
-}
+// ====================================================
+// CART MANAGEMENT - Yêu cầu đăng nhập để sử dụng
+// ====================================================
 
 async function addToCart(variantId, quantity = 1) {
     const user = getCurrentUser();
-    if (user) {
-        try {
-            const res = await apiFetch("CartApi/add", {
-                method: "POST",
-                body: { variantId, quantity }
-            });
-            const data = await res.json();
-            return { success: res.ok, message: data.message };
-        } catch (e) {
-            return { success: false, message: "Lỗi kết nối máy chủ." };
-        }
-    } else {
-        // Guest mode
-        const cart = getLocalCart();
-        const existing = cart.find(i => i.productVariantId === variantId);
-        if (existing) {
-            existing.quantity += quantity;
-        } else {
-            cart.push({ productVariantId: variantId, quantity });
-        }
-        saveLocalCart(cart);
-        return { success: true, message: "Đã thêm sản phẩm vào giỏ hàng thành công! (Lưu tạm thời)" };
+    if (!user) {
+        // Chưa đăng nhập: chuyển đến trang login
+        const returnUrl = encodeURIComponent(window.location.pathname + window.location.search);
+        window.location.href = `login.html?returnUrl=${returnUrl}`;
+        return { success: false, message: "Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng." };
+    }
+    try {
+        const res = await apiFetch("CartApi/add", {
+            method: "POST",
+            body: { variantId, quantity }
+        });
+        const data = await res.json();
+        return { success: res.ok, message: data.message };
+    } catch (e) {
+        return { success: false, message: "Lỗi kết nối máy chủ." };
     }
 }
 
 async function getCartItems() {
     const user = getCurrentUser();
-    if (user) {
-        try {
-            const res = await apiFetch("CartApi");
-            if (res.ok) {
-                return await res.json();
-            }
-        } catch (e) {
-            console.error("Error loading cart:", e);
-        }
-        return [];
-    } else {
-        // Guest Mode: Resolve details from Backend
-        const localCart = getLocalCart();
-        if (localCart.length === 0) return [];
-        
-        try {
-            // Retrieve all products to resolve details
-            const res = await apiFetch("ProductApi?page=1&pageSize=100");
-            if (res.ok) {
-                const data = await res.json();
-                const resolved = [];
-                for (const item of localCart) {
-                    // Search variants
-                    for (const prod of data.products) {
-                        // Fetch detail for this product to get full variant list
-                        const detailRes = await apiFetch(`ProductApi/${prod.id}`);
-                        if (detailRes.ok) {
-                            const detail = await detailRes.json();
-                            const variant = detail.variants.find(v => v.id === item.productVariantId);
-                            if (variant) {
-                                resolved.push({
-                                    id: 0, // Guest cart item has 0 DB id
-                                    productVariantId: variant.id,
-                                    productName: detail.name,
-                                    size: variant.size,
-                                    color: variant.color,
-                                    price: detail.discountPrice || detail.price,
-                                    imageUrl: detail.images.find(img => img.isMain)?.imageUrl || "https://images.unsplash.com/photo-1523381210434-271e8be1f52b?w=400",
-                                    quantity: item.quantity,
-                                    stockQuantity: variant.stock,
-                                    totalPrice: (detail.discountPrice || detail.price) * item.quantity
-                                });
-                                break;
-                            }
-                        }
-                    }
-                }
-                return resolved;
-            }
-        } catch (e) {
-            console.error("Error fetching guest details:", e);
-        }
-        return [];
+    if (!user) return [];
+    try {
+        const res = await apiFetch("CartApi");
+        if (res.ok) return await res.json();
+    } catch (e) {
+        console.error("Error loading cart:", e);
     }
+    return [];
 }
 
 async function updateCartQuantity(cartItemId, variantId, quantity) {
     const user = getCurrentUser();
-    if (user) {
-        const res = await apiFetch("CartApi/update", {
-            method: "POST",
-            body: { cartItemId, variantId, quantity }
-        });
-        const data = await res.json();
-        return { success: res.ok, message: data.message };
-    } else {
-        const cart = getLocalCart();
-        const item = cart.find(i => i.productVariantId === variantId);
-        if (item) {
-            item.quantity = quantity;
-            saveLocalCart(cart);
-            return { success: true, message: "Cập nhật số lượng thành công!" };
-        }
-        return { success: false, message: "Không tìm thấy sản phẩm." };
+    if (!user) {
+        window.location.href = "login.html";
+        return { success: false, message: "Vui lòng đăng nhập." };
     }
+    const res = await apiFetch("CartApi/update", {
+        method: "POST",
+        body: { cartItemId, variantId, quantity }
+    });
+    const data = await res.json();
+    return { success: res.ok, message: data.message };
 }
 
 async function removeCartItem(cartItemId, variantId) {
     const user = getCurrentUser();
-    if (user) {
-        const res = await apiFetch("CartApi/remove", {
-            method: "POST",
-            body: { cartItemId }
-        });
-        const data = await res.json();
-        return { success: res.ok, message: data.message };
-    } else {
-        let cart = getLocalCart();
-        cart = cart.filter(i => i.productVariantId !== variantId);
-        saveLocalCart(cart);
-        return { success: true, message: "Đã xóa sản phẩm khỏi giỏ hàng!" };
+    if (!user) {
+        window.location.href = "login.html";
+        return { success: false, message: "Vui lòng đăng nhập." };
     }
-}
-
-async function syncGuestCartOnLogin() {
-    const localCart = getLocalCart();
-    if (localCart.length > 0) {
-        try {
-            const formatted = localCart.map(i => ({ productVariantId: i.productVariantId, quantity: i.quantity }));
-            const res = await apiFetch("CartApi/sync", {
-                method: "POST",
-                body: formatted
-            });
-            if (res.ok) {
-                localStorage.removeItem(LOCAL_CART_KEY);
-            }
-        } catch (e) {
-            console.warn("Cart synchronization failed.");
-        }
-    }
+    const res = await apiFetch("CartApi/remove", {
+        method: "POST",
+        body: { cartItemId }
+    });
+    const data = await res.json();
+    return { success: res.ok, message: data.message };
 }
 
 async function updateCartCountBadge() {
     const badge = document.getElementById("cart-badge");
     if (!badge) return;
-    
+
     const user = getCurrentUser();
-    let count = 0;
-    if (user) {
-        try {
-            const res = await apiFetch("CartApi");
-            if (res.ok) {
-                const items = await res.json();
-                count = items.reduce((sum, item) => sum + item.quantity, 0);
-            }
-        } catch (e) {
-            console.warn("Could not retrieve cart count.");
-        }
-    } else {
-        const cart = getLocalCart();
-        count = cart.reduce((sum, item) => sum + item.quantity, 0);
+    if (!user) {
+        badge.style.display = "none";
+        return;
     }
-    
+
+    let count = 0;
+    try {
+        const res = await apiFetch("CartApi");
+        if (res.ok) {
+            const items = await res.json();
+            count = items.reduce((sum, item) => sum + item.quantity, 0);
+        }
+    } catch (e) {
+        console.warn("Could not retrieve cart count.");
+    }
+
     badge.innerText = count;
     badge.style.display = count > 0 ? "flex" : "none";
 }

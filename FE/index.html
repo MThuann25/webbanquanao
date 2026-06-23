@@ -1,11 +1,10 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ClothingShop - Hệ thống thời trang hàng đầu</title>
     <!-- Fonts & Icons -->
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -14,7 +13,7 @@
             theme: {
                 extend: {
                     fontFamily: {
-                        sans: ['Outfit', 'sans-serif'],
+                        sans: ['Times New Roman', 'Times', 'serif'],
                     },
                     colors: {
                         indigo: {
@@ -156,8 +155,8 @@
                                         <div class="flex flex-col">
                                             ${priceHtml}
                                         </div>
-                                        <a href="detail.html?id=${p.id}" class="w-10 h-10 bg-indigo-50 group-hover:bg-indigo-600 text-indigo-600 group-hover:text-white rounded-full flex items-center justify-center transition-all duration-300 shadow shadow-indigo-100">
-                                            <i class="fa-solid fa-cart-shopping text-sm"></i>
+                                        <a href="detail.html?id=${p.id}" class="px-3 py-1.5 bg-indigo-50 group-hover:bg-indigo-600 text-indigo-600 group-hover:text-white rounded-full text-[10px] font-bold transition-all duration-300 whitespace-nowrap">
+                                            Xem sản phẩm
                                         </a>
                                     </div>
                                 </div>
