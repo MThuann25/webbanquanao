@@ -17,3 +17,12 @@ Thumbs.db
 ehthumbs.db
 Desktop.ini
 .DS_Store
+
+# Frontend Node Modules & Builds
+node_modules/
+dist/
+.env
+.env.*
+.vite/
+.eslintcache
+
