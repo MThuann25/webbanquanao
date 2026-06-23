@@ -254,8 +254,16 @@ namespace ClothingShop.Web.Controllers
 
         [HttpGet("externallogin")]
         [AllowAnonymous]
-        public IActionResult ExternalLogin([FromQuery] string provider, [FromQuery] string? returnUrl = null)
+        public async Task<IActionResult> ExternalLogin([FromQuery] string provider, [FromQuery] string? returnUrl = null)
         {
+            var schemes = await _signInManager.GetExternalAuthenticationSchemesAsync();
+            if (!schemes.Any(s => s.Name.Equals(provider, StringComparison.OrdinalIgnoreCase)))
+            {
+                var targetUrl = returnUrl ?? "";
+                var loginUrl = targetUrl.Contains("/profile.html") ? targetUrl.Replace("/profile.html", "/login.html") : "login.html";
+                return Redirect($"{loginUrl}?error={Uri.EscapeDataString("Đăng nhập bằng Google hiện chưa hoạt động do thiếu Client ID và Client Secret thực tế trong appsettings.json ở Backend.")}");
+            }
+
             var redirectUrl = Url.Action("ExternalLoginCallback", "AuthApi", new { returnUrl });
             var properties = _signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
             return Challenge(properties, provider);
@@ -311,6 +319,7 @@ namespace ClothingShop.Web.Controllers
                 UserName = email,
                 Email = email,
                 FullName = info.Principal.FindFirstValue(ClaimTypes.Name) ?? email,
+                Address = "", // Tránh lỗi NOT NULL constraint của Postgres
                 EmailConfirmed = true,
                 CreatedDate = DateTime.UtcNow
             };

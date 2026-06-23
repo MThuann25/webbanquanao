@@ -287,7 +287,7 @@ namespace ClothingShop.Infrastructure.Data
                 var ptJogger = productTypes.FirstOrDefault(pt => pt.Name == "Quần jogger") ?? productTypes.FirstOrDefault();
                 var ptPolo = productTypes.FirstOrDefault(pt => pt.Name == "Polo") ?? productTypes.FirstOrDefault();
 
-                var itemsToSeed = new List<(string Name, string Description, decimal Price, decimal? DiscountPrice, Category Cat, Brand Br, ProductType Pt)>
+                var itemsToSeed = new List<(string Name, string Description, decimal Price, decimal? DiscountPrice, Category? Cat, Brand? Br, ProductType? Pt)>
                 {
                     // 1. Đồ Thu Đông
                     ("Áo Hoodie Nỉ Bông Adidas Thu Đông", "Áo hoodie thể thao nỉ bông cao cấp từ Adidas mang phong cách trẻ trung năng động, thích hợp cho thời tiết lạnh thu đông.", 850000m, 690000m, aoNam, adidas, ptHoodie),
