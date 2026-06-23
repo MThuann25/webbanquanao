@@ -160,6 +160,79 @@ function startLogoTypewriter() {
 
 // Global UI Rendering Helpers
 function injectHeader() {
+    const user = getCurrentUser();
+    const isAdmin = user && user.roles && user.roles.includes("Admin");
+
+    const logoHtml = isAdmin ? `
+        <a href="admin.html" id="dmt-logo-link">
+            <!-- SVG Icon Móc áo vẽ nét -->
+            <span class="dmt-bounce-item" style="animation-delay: 0s;">
+                <svg class="dmt-logo-icon h-7 w-7 mr-1.5 text-indigo-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 2a3 3 0 0 1 3 3c0 .82-.4 1.5-1 2H10c-.6-.5-1-1.18-1-2a3 3 0 0 1 3-3z"/>
+                    <path d="M21 16.5A2.5 2.5 0 0 1 18.5 19H5.5A2.5 2.5 0 0 1 3 16.5c0-1.8 1-3.4 2.5-4.2l6-3.3a1 1 0 0 1 1 0l6 3.3c1.5.8 2.5 2.4 2.5 4.2z"/>
+                </svg>
+            </span>
+            <span class="dmt-logo-bold">
+                <span class="dmt-bounce-item" style="animation-delay: 0.15s;">D</span>
+                <span class="dmt-bounce-item" style="animation-delay: 0.3s;">M</span>
+                <span class="dmt-bounce-item" style="animation-delay: 0.45s;">T</span>
+            </span>
+            <span class="dmt-logo-light">
+                <span class="dmt-bounce-item" style="animation-delay: 0.6s;">S</span>
+                <span class="dmt-bounce-item" style="animation-delay: 0.75s;">h</span>
+                <span class="dmt-bounce-item" style="animation-delay: 0.9s;">o</span>
+                <span class="dmt-bounce-item" style="animation-delay: 1.05s;">p</span>
+            </span>
+        </a>
+    ` : `
+        <a href="index.html" id="dmt-logo-link">
+            <!-- SVG Icon Móc áo vẽ nét -->
+            <span class="dmt-bounce-item" style="animation-delay: 0s;">
+                <svg class="dmt-logo-icon h-7 w-7 mr-1.5 text-indigo-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 2a3 3 0 0 1 3 3c0 .82-.4 1.5-1 2H10c-.6-.5-1-1.18-1-2a3 3 0 0 1 3-3z"/>
+                    <path d="M21 16.5A2.5 2.5 0 0 1 18.5 19H5.5A2.5 2.5 0 0 1 3 16.5c0-1.8 1-3.4 2.5-4.2l6-3.3a1 1 0 0 1 1 0l6 3.3c1.5.8 2.5 2.4 2.5 4.2z"/>
+                </svg>
+            </span>
+            <span class="dmt-logo-bold">
+                <span class="dmt-bounce-item" style="animation-delay: 0.15s;">D</span>
+                <span class="dmt-bounce-item" style="animation-delay: 0.3s;">M</span>
+                <span class="dmt-bounce-item" style="animation-delay: 0.45s;">T</span>
+            </span>
+            <span class="dmt-logo-light">
+                <span class="dmt-bounce-item" style="animation-delay: 0.6s;">S</span>
+                <span class="dmt-bounce-item" style="animation-delay: 0.75s;">h</span>
+                <span class="dmt-bounce-item" style="animation-delay: 0.9s;">o</span>
+                <span class="dmt-bounce-item" style="animation-delay: 1.05s;">p</span>
+            </span>
+        </a>
+    `;
+
+    const navLinksHtml = isAdmin ? "" : `
+        <!-- Nav Links -->
+        <nav class="hidden md:flex space-x-8">
+            <a href="index.html" class="text-gray-600 hover:text-indigo-600 px-3 py-2 text-sm font-medium transition">Trang Chủ</a>
+            <a href="shop.html" class="text-gray-600 hover:text-indigo-600 px-3 py-2 text-sm font-medium transition">Cửa Hàng</a>
+        </nav>
+    `;
+
+    const searchHtml = isAdmin ? "" : `
+        <!-- Search Bar -->
+        <form onsubmit="event.preventDefault(); const q = this.querySelector('input').value; if(q) window.location.href='shop.html?search='+encodeURIComponent(q);" class="hidden sm:flex relative text-gray-600">
+            <input type="search" placeholder="Tìm kiếm..." class="bg-gray-100 h-10 px-5 pr-10 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 w-40 lg:w-64 transition-all border border-transparent focus:bg-white focus:border-indigo-200">
+            <button type="submit" class="absolute right-0 top-0 mt-2.5 mr-4 text-gray-400 hover:text-indigo-600 transition">
+                <i class="fa-solid fa-magnifying-glass"></i>
+            </button>
+        </form>
+    `;
+
+    const cartHtml = isAdmin ? "" : `
+        <!-- Cart -->
+        <a href="cart.html" class="relative p-2 text-gray-600 hover:text-indigo-600 transition">
+            <i class="fa-solid fa-bag-shopping text-xl"></i>
+            <span id="cart-badge" class="absolute -top-1 -right-1 bg-gradient-to-r from-pink-500 to-rose-500 text-white rounded-full text-xxs w-5 h-5 flex items-center justify-center font-bold" style="display: none;">0</span>
+        </a>
+    `;
+
     const headerHtml = `
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;900&display=swap');
@@ -239,51 +312,17 @@ function injectHeader() {
     <header class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100 transition-all duration-300">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
-                <!-- Logo DMTShop Animated -->
+                <!-- Logo Area -->
                 <div class="flex-shrink-0">
-                    <a href="index.html" id="dmt-logo-link">
-                        <!-- SVG Icon Móc áo vẽ nét -->
-                        <span class="dmt-bounce-item" style="animation-delay: 0s;">
-                            <svg class="dmt-logo-icon h-7 w-7 mr-1.5 text-indigo-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M12 2a3 3 0 0 1 3 3c0 .82-.4 1.5-1 2H10c-.6-.5-1-1.18-1-2a3 3 0 0 1 3-3z"/>
-                                <path d="M21 16.5A2.5 2.5 0 0 1 18.5 19H5.5A2.5 2.5 0 0 1 3 16.5c0-1.8 1-3.4 2.5-4.2l6-3.3a1 1 0 0 1 1 0l6 3.3c1.5.8 2.5 2.4 2.5 4.2z"/>
-                            </svg>
-                        </span>
-                        <span class="dmt-logo-bold">
-                            <span class="dmt-bounce-item" style="animation-delay: 0.15s;">D</span>
-                            <span class="dmt-bounce-item" style="animation-delay: 0.3s;">M</span>
-                            <span class="dmt-bounce-item" style="animation-delay: 0.45s;">T</span>
-                        </span>
-                        <span class="dmt-logo-light">
-                            <span class="dmt-bounce-item" style="animation-delay: 0.6s;">S</span>
-                            <span class="dmt-bounce-item" style="animation-delay: 0.75s;">h</span>
-                            <span class="dmt-bounce-item" style="animation-delay: 0.9s;">o</span>
-                            <span class="dmt-bounce-item" style="animation-delay: 1.05s;">p</span>
-                        </span>
-                    </a>
+                    ${logoHtml}
                 </div>
                 
-                <!-- Nav Links -->
-                <nav class="hidden md:flex space-x-8">
-                    <a href="index.html" class="text-gray-600 hover:text-indigo-600 px-3 py-2 text-sm font-medium transition">Trang Chủ</a>
-                    <a href="shop.html" class="text-gray-600 hover:text-indigo-600 px-3 py-2 text-sm font-medium transition">Cửa Hàng</a>
-                </nav>
+                ${navLinksHtml}
                 
                 <!-- Actions -->
                 <div class="flex items-center space-x-4">
-                    <!-- Search Bar -->
-                    <form onsubmit="event.preventDefault(); const q = this.querySelector('input').value; if(q) window.location.href='shop.html?search='+encodeURIComponent(q);" class="hidden sm:flex relative text-gray-600">
-                        <input type="search" placeholder="Tìm kiếm..." class="bg-gray-100 h-10 px-5 pr-10 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 w-40 lg:w-64 transition-all border border-transparent focus:bg-white focus:border-indigo-200">
-                        <button type="submit" class="absolute right-0 top-0 mt-2.5 mr-4 text-gray-400 hover:text-indigo-600 transition">
-                            <i class="fa-solid fa-magnifying-glass"></i>
-                        </button>
-                    </form>
-
-                    <!-- Cart -->
-                    <a href="cart.html" class="relative p-2 text-gray-600 hover:text-indigo-600 transition">
-                        <i class="fa-solid fa-bag-shopping text-xl"></i>
-                        <span id="cart-badge" class="absolute -top-1 -right-1 bg-gradient-to-r from-pink-500 to-rose-500 text-white rounded-full text-xxs w-5 h-5 flex items-center justify-center font-bold" style="display: none;">0</span>
-                    </a>
+                    ${searchHtml}
+                    ${cartHtml}
                     
                     <!-- Auth -->
                     <div id="auth-actions" class="flex items-center space-x-2">
@@ -299,10 +338,8 @@ function injectHeader() {
     document.body.insertAdjacentHTML('afterbegin', headerHtml);
     
     // Update Auth buttons
-    const user = getCurrentUser();
     const authActions = document.getElementById("auth-actions");
     if (user && authActions) {
-        const isAdmin = user.roles && user.roles.includes("Admin");
         authActions.innerHTML = `
             <div class="relative group">
                 <button class="flex items-center space-x-2 p-2 text-gray-700 hover:text-indigo-600 transition">
@@ -637,19 +674,24 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Determine active login state
     await checkAuthStatus();
     
+    const user = getCurrentUser();
+    const isAdmin = user && user.roles && user.roles.includes("Admin");
+    
     // Inject components
     injectHeader();
     injectFooter();
     // Khởi động typewriter logo
     startLogoTypewriter();
     
-    // Load SignalR library and inject chatbox
-    const script = document.createElement("script");
-    script.src = "https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.min.js";
-    script.onload = () => {
-        injectChatbox();
-    };
-    document.head.appendChild(script);
+    // Load SignalR library and inject chatbox (Not loaded for Admin)
+    if (!isAdmin) {
+        const script = document.createElement("script");
+        script.src = "https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.min.js";
+        script.onload = () => {
+            injectChatbox();
+        };
+        document.head.appendChild(script);
+    }
     
     // Sync cart count
     updateCartCountBadge();

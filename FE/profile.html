@@ -224,9 +224,56 @@
         </div>
     </div>
 
+    <!-- Review Product Modal -->
+    <div id="review-modal" class="fixed inset-0 bg-black/55 hidden z-[60] items-center justify-center p-4">
+        <div class="bg-white border border-gray-200 rounded-3xl w-full max-w-sm overflow-hidden shadow-2xl p-6 space-y-4">
+            <div class="flex justify-between items-center border-b border-gray-100 pb-3">
+                <h3 class="font-black text-sm text-gray-800">Đánh giá sản phẩm</h3>
+                <button onclick="closeReviewModal()" class="text-gray-400 hover:text-gray-600 transition"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            
+            <div class="space-y-4">
+                <div class="flex items-center space-x-3">
+                    <img id="review-product-image" src="" class="w-12 h-14 object-cover rounded border border-gray-100 flex-shrink-0">
+                    <div class="min-w-0 flex-grow">
+                        <h4 id="review-product-name" class="font-bold text-xs text-gray-800 line-clamp-2">Tên sản phẩm</h4>
+                    </div>
+                </div>
+
+                <!-- Chọn số sao -->
+                <div class="flex flex-col items-center py-2 space-y-1">
+                    <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Chọn số sao</label>
+                    <div class="flex space-x-2" id="star-rating-container">
+                        <i class="fa-regular fa-star text-2xl text-amber-400 cursor-pointer transition-transform hover:scale-110" data-star="1" onclick="setReviewRating(1)"></i>
+                        <i class="fa-regular fa-star text-2xl text-amber-400 cursor-pointer transition-transform hover:scale-110" data-star="2" onclick="setReviewRating(2)"></i>
+                        <i class="fa-regular fa-star text-2xl text-amber-400 cursor-pointer transition-transform hover:scale-110" data-star="3" onclick="setReviewRating(3)"></i>
+                        <i class="fa-regular fa-star text-2xl text-amber-400 cursor-pointer transition-transform hover:scale-110" data-star="4" onclick="setReviewRating(4)"></i>
+                        <i class="fa-regular fa-star text-2xl text-amber-400 cursor-pointer transition-transform hover:scale-110" data-star="5" onclick="setReviewRating(5)"></i>
+                    </div>
+                </div>
+
+                <!-- Bình luận -->
+                <div class="space-y-1">
+                    <label class="text-[9px] font-bold text-gray-400 uppercase tracking-wider" for="review-comment">Nhận xét của bạn</label>
+                    <textarea id="review-comment" rows="3" class="w-full border border-gray-200 rounded-xl p-3 text-xs focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition resize-none" placeholder="Nhập cảm nhận của bạn về sản phẩm..."></textarea>
+                </div>
+            </div>
+            
+            <div class="flex justify-end space-x-2 pt-2">
+                <button onclick="closeReviewModal()" class="px-4 py-2 border border-gray-200 rounded-full text-xs font-bold text-gray-600 hover:bg-gray-50 transition">Hủy</button>
+                <button onclick="submitReview()" class="px-6 py-2 bg-indigo-600 hover:bg-indigo-750 text-white rounded-full text-xs font-bold transition shadow-md shadow-indigo-100">Gửi đánh giá</button>
+            </div>
+        </div>
+    </div>
+
     <!-- JS scripts -->
     <script src="js/app.js"></script>
     <script>
+        let currentReviewProductId = 0;
+        let currentReviewOrderId = 0;
+        let currentReviewRating = 0;
+        let currentOrderItems = [];
+
         document.addEventListener("DOMContentLoaded", async () => {
             let user = getCurrentUser();
             if (!user) {
@@ -463,18 +510,40 @@
                 const res = await apiFetch(`AuthApi/orders/${orderId}`);
                 if (res.ok) {
                     const data = await res.json();
+                    currentOrderItems = data.items;
                     
                     let itemsHtml = "";
                     data.items.forEach(item => {
+                        let reviewBtnHtml = "";
+                        if (data.status === "Hoàn thành") {
+                            if (item.isReviewed) {
+                                reviewBtnHtml = `
+                                    <span class="text-[10px] text-emerald-600 font-bold bg-emerald-50 px-2.5 py-1 rounded-full flex items-center gap-1 flex-shrink-0">
+                                        <i class="fa-solid fa-circle-check"></i> Đã đánh giá
+                                    </span>
+                                `;
+                            } else {
+                                reviewBtnHtml = `
+                                    <button onclick="openReviewModal(${item.productId}, ${data.id})" 
+                                            class="text-[10px] text-white font-bold bg-indigo-600 hover:bg-indigo-750 px-3 py-1 rounded-full transition shadow-sm flex-shrink-0">
+                                        Viết đánh giá
+                                    </button>
+                                `;
+                            }
+                        }
+
                         itemsHtml += `
                             <div class="flex items-center space-x-3 py-2 border-b border-gray-50">
                                 <img src="${item.imageUrl}" class="w-10 h-12 object-cover rounded border border-gray-100 flex-shrink-0">
-                                <div class="flex-grow">
+                                <div class="flex-grow min-w-0">
                                     <h4 class="font-bold text-xs text-gray-800 line-clamp-1">${item.productName}</h4>
                                     <p class="text-[9px] text-gray-400">Phân loại: Size ${item.size} / Màu ${item.color}</p>
                                 </div>
-                                <span class="font-bold text-gray-700">${item.quantity}x</span>
-                                <span class="font-bold text-indigo-600">${(item.unitPrice * item.quantity).toLocaleString("vi-VN")}đ</span>
+                                <div class="flex items-center space-x-3 flex-shrink-0">
+                                    <span class="font-bold text-gray-700">${item.quantity}x</span>
+                                    <span class="font-bold text-indigo-600 mr-2">${(item.unitPrice * item.quantity).toLocaleString("vi-VN")}đ</span>
+                                    ${reviewBtnHtml}
+                                </div>
                             </div>
                         `;
                     });
@@ -638,6 +707,88 @@
             }).catch(err => {
                 console.error("Copy failed", err);
             });
+        }
+
+        function openReviewModal(productId, orderId) {
+            currentReviewProductId = productId;
+            currentReviewOrderId = orderId;
+            currentReviewRating = 0;
+            
+            // Tìm sản phẩm trong currentOrderItems
+            const item = currentOrderItems.find(i => i.productId === productId);
+            if (item) {
+                document.getElementById("review-product-image").src = item.imageUrl;
+                document.getElementById("review-product-name").innerText = item.productName;
+            }
+            
+            // Reset số sao và ô comment
+            setReviewRating(0);
+            document.getElementById("review-comment").value = "";
+            
+            const modal = document.getElementById("review-modal");
+            modal.classList.remove("hidden");
+            modal.classList.add("flex");
+        }
+
+        function setReviewRating(rating) {
+            currentReviewRating = rating;
+            const stars = document.querySelectorAll("#star-rating-container i");
+            stars.forEach((star, idx) => {
+                if (idx < rating) {
+                    star.classList.remove("fa-regular");
+                    star.classList.add("fa-solid");
+                } else {
+                    star.classList.remove("fa-solid");
+                    star.classList.add("fa-regular");
+                }
+            });
+        }
+
+        function closeReviewModal() {
+            const modal = document.getElementById("review-modal");
+            modal.classList.add("hidden");
+            modal.classList.remove("flex");
+        }
+
+        async function submitReview() {
+            if (currentReviewRating === 0) {
+                alert("Vui lòng chọn số sao đánh giá sản phẩm!");
+                return;
+            }
+            
+            const comment = document.getElementById("review-comment").value.trim();
+            const btn = document.querySelector("#review-modal button[onclick='submitReview()']");
+            const originalText = btn.innerText;
+            
+            btn.disabled = true;
+            btn.innerText = "Đang gửi...";
+            
+            try {
+                const res = await apiFetch(`ProductApi/${currentReviewProductId}/reviews`, {
+                    method: "POST",
+                    body: {
+                        rating: currentReviewRating,
+                        comment: comment,
+                        orderId: currentReviewOrderId
+                    }
+                });
+                
+                const data = await res.json();
+                if (res.ok) {
+                    alert(data.message || "Gửi đánh giá thành công!");
+                    closeReviewModal();
+                    // Load lại chi tiết đơn hàng hiện tại để đổi nút thành "Đã đánh giá"
+                    await viewOrderDetails(currentReviewOrderId);
+                } else {
+                    alert(data.message || "Không thể gửi đánh giá.");
+                }
+            } catch (e) {
+                console.error("Submit review error:", e);
+                alert("Lỗi kết nối hệ thống.");
+            } finally {
+                btn.disabled = false;
+                btn.innerText = originalText;
+            }
         }
 
         function showProfileAlert(message, type) {

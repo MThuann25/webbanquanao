@@ -225,6 +225,11 @@ namespace ClothingShop.Web.Controllers
 
             if (order == null) return NotFound(new { message = "Không tìm thấy đơn hàng." });
 
+            // Lấy danh sách reviews đã có cho đơn hàng này
+            var reviews = await _unitOfWork.Repository<Review>().GetQueryable()
+                .Where(r => r.OrderId == id && r.UserId == userId)
+                .ToListAsync();
+
             var result = new
             {
                 id = order.Id,
@@ -238,17 +243,23 @@ namespace ClothingShop.Web.Controllers
                 paymentMethod = order.PaymentMethod,
                 paymentStatus = order.PaymentMethod.Contains("Đã thanh toán") ? "Paid" : "Pending",
                 voucherCode = order.VoucherCode,
-                items = order.OrderDetails.Select(od => new
-                {
-                    id = od.Id,
-                    productName = od.ProductVariant != null && od.ProductVariant.Product != null ? od.ProductVariant.Product.Name : "",
-                    size = od.ProductVariant != null ? od.ProductVariant.Size : "",
-                    color = od.ProductVariant != null ? od.ProductVariant.Color : "",
-                    quantity = od.Quantity,
-                    unitPrice = od.UnitPrice,
-                    imageUrl = od.ProductVariant != null && od.ProductVariant.Product != null && od.ProductVariant.Product.ProductImages != null && od.ProductVariant.Product.ProductImages.Any(pi => pi.IsMain) 
-                        ? od.ProductVariant.Product.ProductImages.First(pi => pi.IsMain).ImageUrl 
-                        : "https://images.unsplash.com/photo-1523381210434-271e8be1f52b?w=400"
+                items = order.OrderDetails.Select(od => {
+                    var prodId = od.ProductVariant != null ? od.ProductVariant.ProductId : 0;
+                    var isReviewed = reviews.Any(r => r.ProductId == prodId);
+                    return new
+                    {
+                        id = od.Id,
+                        productId = prodId,
+                        productName = od.ProductVariant != null && od.ProductVariant.Product != null ? od.ProductVariant.Product.Name : "",
+                        size = od.ProductVariant != null ? od.ProductVariant.Size : "",
+                        color = od.ProductVariant != null ? od.ProductVariant.Color : "",
+                        quantity = od.Quantity,
+                        unitPrice = od.UnitPrice,
+                        imageUrl = od.ProductVariant != null && od.ProductVariant.Product != null && od.ProductVariant.Product.ProductImages != null && od.ProductVariant.Product.ProductImages.Any(pi => pi.IsMain) 
+                            ? od.ProductVariant.Product.ProductImages.First(pi => pi.IsMain).ImageUrl 
+                            : "https://images.unsplash.com/photo-1523381210434-271e8be1f52b?w=400",
+                        isReviewed = isReviewed
+                    };
                 }).ToList()
             };
 
