@@ -15,6 +15,7 @@ using ClothingShop.Infrastructure.Data;
 using ClothingShop.Infrastructure.Repositories;
 using ClothingShop.Application.Services;
 using ClothingShop.Web.Hubs;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -57,8 +58,8 @@ if (!string.IsNullOrEmpty(googleClientId) && !string.IsNullOrEmpty(googleClientS
 builder.Services.ConfigureApplicationCookie(options =>
 {
     options.Cookie.HttpOnly = true;
-    options.Cookie.SameSite = SameSiteMode.None; // Required for cross-origin cookie sharing
-    options.Cookie.SecurePolicy = CookieSecurePolicy.Always; // SameSite=None requires Secure (HTTPS)
+    options.Cookie.SameSite = SameSiteMode.Lax; // Changed from None to Lax since we are using Vite Proxy
+    options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest; // Changed from Always to SameAsRequest to support HTTP callback on localhost
     
     // Instead of redirecting to razor page login, return status codes for AJAX calls
     options.Events.OnRedirectToLogin = context =>
@@ -71,6 +72,12 @@ builder.Services.ConfigureApplicationCookie(options =>
         context.Response.StatusCode = StatusCodes.Status403Forbidden;
         return Task.CompletedTask;
     };
+});
+
+builder.Services.Configure<CookieAuthenticationOptions>(IdentityConstants.ExternalScheme, options =>
+{
+    options.Cookie.SameSite = SameSiteMode.Lax;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
 });
 
 // 5. Configure CORS to allow static FE to interact with credentials
