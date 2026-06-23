@@ -297,6 +297,13 @@
                                    <span class="text-xxs line-through text-gray-400 ml-2">${p.price.toLocaleString("vi-VN")}đ</span>` 
                                 : `<span class="text-sm font-black text-gray-900">${p.price.toLocaleString("vi-VN")}đ</span>`;
                             
+                            const ratingHtml = p.rating != null
+                                ? `<div class="flex items-center gap-1 mt-1">
+                                    <span class="text-amber-400 text-xs">${'★'.repeat(Math.round(p.rating))}${'☆'.repeat(5 - Math.round(p.rating))}</span>
+                                    <span class="text-xxs text-gray-400">${p.rating.toFixed(1)} (${p.ratingCount})</span>
+                                   </div>`
+                                : `<div class="mt-1 text-xxs text-gray-300 italic">Chưa có đánh giá</div>`;
+
                             const card = document.createElement("div");
                             card.className = "group bg-white rounded-3xl border border-gray-100 overflow-hidden hover:shadow-xl hover:shadow-indigo-500/5 transition duration-300 flex flex-col";
                             card.innerHTML = `
@@ -307,6 +314,7 @@
                                 <div class="p-5 flex-1 flex flex-col">
                                     <span class="text-xxs text-gray-400 uppercase tracking-widest font-semibold">${p.brandName || "Thương hiệu"}</span>
                                     <h3 class="font-bold text-xs text-gray-800 mt-2 line-clamp-2 min-h-[36px] group-hover:text-indigo-600 transition"><a href="detail.html?id=${p.id}">${p.name}</a></h3>
+                                    ${ratingHtml}
                                     <div class="mt-4 flex items-center justify-between">
                                         <div class="flex flex-col">
                                             ${priceHtml}

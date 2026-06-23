@@ -113,9 +113,10 @@
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-12 mb-12">
             <!-- Reviews List -->
             <div class="lg:col-span-2 space-y-6">
-                <h2 class="text-xl font-black text-gray-900 tracking-tight flex items-center space-x-2">
+                <h2 class="text-xl font-black text-gray-900 tracking-tight flex items-center space-x-2 flex-wrap gap-y-1">
                     <i class="fa-regular fa-comments text-gray-500"></i>
                     <span>Khách Hàng Đánh Giá</span>
+                    <span id="rating-summary" class="flex items-center gap-1 ml-2"></span>
                 </h2>
                 <div id="reviews-box" class="space-y-4">
                     <!-- Reviews list -->
@@ -126,6 +127,14 @@
             <div class="bg-white rounded-3xl border border-gray-150 shadow-sm p-6 self-start space-y-4">
                 <h3 class="font-bold text-xs uppercase text-gray-400 tracking-wider">Viết Đánh Giá</h3>
                 <div id="review-auth-warning" class="hidden text-xxs text-gray-500">Bạn cần <a href="login.html" class="text-indigo-600 font-bold hover:underline">Đăng nhập</a> để bình luận.</div>
+                <div id="review-not-purchased" class="hidden text-xxs text-amber-600 bg-amber-50 rounded-xl p-3">
+                    <i class="fa-solid fa-bag-shopping mr-1"></i>
+                    Bạn cần <strong>mua và nhận hàng thành công</strong> để có thể đánh giá sản phẩm này.
+                </div>
+                <div id="review-already-done" class="hidden text-xxs text-green-600 bg-green-50 rounded-xl p-3">
+                    <i class="fa-solid fa-circle-check mr-1"></i>
+                    Bạn đã đánh giá sản phẩm này rồi. Cảm ơn!
+                </div>
                 
                 <form id="review-form" class="space-y-4" onsubmit="submitReview(event)">
                     <div>
@@ -178,17 +187,41 @@
             checkReviewAuth();
         });
 
-        function checkReviewAuth() {
+        async function checkReviewAuth() {
             const user = getCurrentUser();
             const form = document.getElementById("review-form");
             const warning = document.getElementById("review-auth-warning");
-            
-            if (user) {
-                form.classList.remove("hidden");
-                warning.classList.add("hidden");
-            } else {
-                form.classList.add("hidden");
+            const notPurchased = document.getElementById("review-not-purchased");
+            const alreadyDone = document.getElementById("review-already-done");
+
+            // Ẩn tất cả trước
+            form.classList.add("hidden");
+            warning.classList.add("hidden");
+            notPurchased.classList.add("hidden");
+            alreadyDone.classList.add("hidden");
+
+            if (!user) {
                 warning.classList.remove("hidden");
+                return;
+            }
+
+            // Gọi API kiểm tra đã mua chưa
+            try {
+                const res = await apiFetch(`ProductApi/${productId}/check-purchase`);
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.hasReviewed) {
+                        alreadyDone.classList.remove("hidden");
+                    } else if (data.hasPurchased) {
+                        form.classList.remove("hidden");
+                    } else {
+                        notPurchased.classList.remove("hidden");
+                    }
+                } else {
+                    notPurchased.classList.remove("hidden");
+                }
+            } catch (e) {
+                notPurchased.classList.remove("hidden");
             }
         }
 
@@ -257,9 +290,25 @@
                     if (uniqueSizes.length > 0) selectSize(uniqueSizes[0]);
                     if (uniqueColors.length > 0) selectColor(uniqueColors[0]);
 
-                    // Reviews
+                    // Reviews + Rating summary
                     const reviewsBox = document.getElementById("reviews-box");
                     reviewsBox.innerHTML = "";
+
+                    // Hiển thị rating tổng quan
+                    const ratingHeaderEl = document.getElementById("rating-summary");
+                    if (ratingHeaderEl) {
+                        if (productData.rating != null) {
+                            const stars = Math.round(productData.rating);
+                            ratingHeaderEl.innerHTML = `
+                                <span class="text-amber-400 font-black text-lg">${productData.rating.toFixed(1)}</span>
+                                <span class="text-amber-400 text-sm">${"★".repeat(stars)}${"☆".repeat(5 - stars)}</span>
+                                <span class="text-gray-400 text-xxs">(${productData.ratingCount} đánh giá)</span>
+                            `;
+                        } else {
+                            ratingHeaderEl.innerHTML = `<span class="text-gray-400 text-xxs">Chưa có đánh giá</span>`;
+                        }
+                    }
+
                     if (productData.reviews && productData.reviews.length > 0) {
                         productData.reviews.forEach(r => {
                             reviewsBox.innerHTML += `
