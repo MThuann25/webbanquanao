@@ -1,11 +1,10 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ClothingShop - Đăng Nhập</title>
     <!-- Fonts & Icons -->
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -14,7 +13,7 @@
             theme: {
                 extend: {
                     fontFamily: {
-                        sans: ['Outfit', 'sans-serif'],
+                        sans: ['Times New Roman', 'Times', 'serif'],
                     },
                     colors: {
                         indigo: {
@@ -102,26 +101,20 @@
             const box = document.getElementById("alert-box");
             box.classList.add("hidden");
 
-            // Format guest cart items if any to migrate on login
-            const guestCart = getLocalCart().map(i => ({ productVariantId: i.productVariantId, quantity: i.quantity }));
-
             try {
                 const res = await apiFetch("AuthApi/login", {
                     method: "POST",
-                    body: { email, password, rememberMe, cartItems: guestCart }
+                    body: { email, password, rememberMe }
                 });
                 const data = await res.json();
                 
                 if (res.ok) {
                     localStorage.setItem("user", JSON.stringify(data.user));
-                    // Clear local cart since it migrated
-                    localStorage.removeItem("GuestCart");
-
                     box.className = "p-4 rounded-xl text-xs font-semibold bg-green-100 text-green-700 block";
                     box.innerText = "Đăng nhập thành công! Đang chuyển hướng...";
                     setTimeout(() => {
                         window.location.href = returnUrl;
-                    }, 1000);
+                    }, 800);
                 } else {
                     box.className = "p-4 rounded-xl text-xs font-semibold bg-rose-100 text-rose-700 block";
                     box.innerText = data.message || "Tài khoản hoặc mật khẩu không hợp lệ.";

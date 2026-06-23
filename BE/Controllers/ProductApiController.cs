@@ -69,7 +69,8 @@ namespace ClothingShop.Web.Controllers
                 images = p.ProductImages.Select(pi => pi.ImageUrl).ToList(),
                 categoryName = p.Category?.Name,
                 brandName = p.Brand?.Name,
-                rating = p.Reviews.Any() ? p.Reviews.Average(r => r.Rating) : 5.0
+                rating = p.Reviews.Any(r => r.IsApproved) ? Math.Round(p.Reviews.Where(r => r.IsApproved).Average(r => r.Rating), 1) : (double?)null,
+                ratingCount = p.Reviews.Count(r => r.IsApproved)
             });
 
             return Ok(new
@@ -122,6 +123,10 @@ namespace ClothingShop.Web.Controllers
                 })
                 .ToList();
 
+            var approvedReviews = reviews; // đã là IsApproved=true từ query
+            double? avgRating = approvedReviews.Any() ? Math.Round(approvedReviews.Average(r => r.rating), 1) : (double?)null;
+            int ratingCount = approvedReviews.Count();
+
             var result = new
             {
                 id = product.Id,
@@ -135,10 +140,35 @@ namespace ClothingShop.Web.Controllers
                 images = product.ProductImages.Select(pi => new { id = pi.Id, imageUrl = pi.ImageUrl, isMain = pi.IsMain }).ToList(),
                 variants = product.ProductVariants.Select(pv => new { id = pv.Id, size = pv.Size, color = pv.Color, sku = pv.SKU, stock = pv.Quantity }).ToList(),
                 reviews,
+                rating = avgRating,
+                ratingCount,
                 relatedProducts
             };
 
             return Ok(result);
+        }
+
+        // API kiểm tra người dùng đã mua sản phẩm chưa
+        [HttpGet("{id}/check-purchase")]
+        [Authorize]
+        public IActionResult CheckPurchase(int id)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized(new { hasPurchased = false });
+
+            // Kiểm tra có đơn hàng Hoàn thành chứa sản phẩm này không
+            var hasPurchased = _unitOfWork.Repository<Order>().GetQueryable()
+                .Where(o => o.UserId == userId && o.Status == "Hoàn thành")
+                .Include(o => o.OrderDetails)
+                    .ThenInclude(od => od.ProductVariant)
+                .Any(o => o.OrderDetails.Any(od => od.ProductVariant.ProductId == id));
+
+            // Kiểm tra đã đánh giá chưa
+            var hasReviewed = _unitOfWork.Repository<Review>().GetQueryable()
+                .Any(r => r.ProductId == id && r.UserId == userId);
+
+            return Ok(new { hasPurchased, hasReviewed });
         }
 
         [HttpPost("{id}/reviews")]
@@ -156,6 +186,27 @@ namespace ClothingShop.Web.Controllers
                 return Unauthorized(new { message = "Bạn cần đăng nhập để gửi đánh giá." });
             }
 
+            // Kiểm tra đã mua hàng chưa (phải có đơn Hoàn thành)
+            var hasPurchased = _unitOfWork.Repository<Order>().GetQueryable()
+                .Where(o => o.UserId == userId && o.Status == "Hoàn thành")
+                .Include(o => o.OrderDetails)
+                    .ThenInclude(od => od.ProductVariant)
+                .Any(o => o.OrderDetails.Any(od => od.ProductVariant.ProductId == id));
+
+            if (!hasPurchased)
+            {
+                return BadRequest(new { message = "Bạn chỉ có thể đánh giá sản phẩm sau khi đã mua và nhận hàng thành công." });
+            }
+
+            // Kiểm tra đã đánh giá chưa
+            var existingReview = _unitOfWork.Repository<Review>().GetQueryable()
+                .FirstOrDefault(r => r.ProductId == id && r.UserId == userId);
+
+            if (existingReview != null)
+            {
+                return BadRequest(new { message = "Bạn đã đánh giá sản phẩm này rồi." });
+            }
+
             var review = new Review
             {
                 ProductId = id,
@@ -163,7 +214,7 @@ namespace ClothingShop.Web.Controllers
                 Rating = model.Rating,
                 Comment = model.Comment ?? "",
                 CreatedDate = DateTime.UtcNow,
-                IsApproved = true // Auto-approved for demo
+                IsApproved = true
             };
 
             await _unitOfWork.Repository<Review>().AddAsync(review);

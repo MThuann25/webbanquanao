@@ -1,10 +1,15 @@
+﻿-- ==================================================
+-- DATABASE SCRIPT: ClothingShopDB
+-- Generated: 2026-06-23 22:01:30
+-- ==================================================
+
 -- CREATE DATABASE ClothingShopDB
 -- GO
 -- USE ClothingShopDB
 -- GO
 
 -- --------------------------------------------------
--- 1. DROP TABLES IF THEY EXIST (ORDER MATTERS)
+-- 1. DROP TABLES (ORDER MATTERS)
 -- --------------------------------------------------
 IF OBJECT_ID('dbo.ChatLogs', 'U') IS NOT NULL DROP TABLE dbo.ChatLogs;
 IF OBJECT_ID('dbo.Reviews', 'U') IS NOT NULL DROP TABLE dbo.Reviews;
@@ -18,8 +23,6 @@ IF OBJECT_ID('dbo.Products', 'U') IS NOT NULL DROP TABLE dbo.Products;
 IF OBJECT_ID('dbo.Brands', 'U') IS NOT NULL DROP TABLE dbo.Brands;
 IF OBJECT_ID('dbo.Categories', 'U') IS NOT NULL DROP TABLE dbo.Categories;
 IF OBJECT_ID('dbo.Vouchers', 'U') IS NOT NULL DROP TABLE dbo.Vouchers;
-
--- AspNet Identity Tables (in case they need to be dropped)
 IF OBJECT_ID('dbo.AspNetUserTokens', 'U') IS NOT NULL DROP TABLE dbo.AspNetUserTokens;
 IF OBJECT_ID('dbo.AspNetUserRoles', 'U') IS NOT NULL DROP TABLE dbo.AspNetUserRoles;
 IF OBJECT_ID('dbo.AspNetUserLogins', 'U') IS NOT NULL DROP TABLE dbo.AspNetUserLogins;
@@ -29,7 +32,7 @@ IF OBJECT_ID('dbo.AspNetUsers', 'U') IS NOT NULL DROP TABLE dbo.AspNetUsers;
 IF OBJECT_ID('dbo.AspNetRoles', 'U') IS NOT NULL DROP TABLE dbo.AspNetRoles;
 
 -- --------------------------------------------------
--- 2. CREATE ASP.NET IDENTITY TABLES (SQL 2014 COMPATIBLE)
+-- 2. CREATE ASP.NET IDENTITY TABLES
 -- --------------------------------------------------
 CREATE TABLE dbo.AspNetRoles (
     Id NVARCHAR(450) NOT NULL PRIMARY KEY,
@@ -54,7 +57,6 @@ CREATE TABLE dbo.AspNetUsers (
     LockoutEnd DATETIMEOFFSET NULL,
     LockoutEnabled BIT NOT NULL,
     AccessFailedCount INT NOT NULL,
-    -- Custom fields
     FullName NVARCHAR(256) NULL,
     Address NVARCHAR(500) NULL,
     CreatedDate DATETIME2 NOT NULL DEFAULT GETDATE()
@@ -95,9 +97,8 @@ CREATE TABLE dbo.AspNetUserTokens (
     Value NVARCHAR(MAX) NULL,
     PRIMARY KEY (UserId, LoginProvider, Name)
 );
-
 -- --------------------------------------------------
--- 3. CREATE BUSINESS LOGIC TABLES
+-- 3. CREATE BUSINESS TABLES
 -- --------------------------------------------------
 CREATE TABLE dbo.Categories (
     Id INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
@@ -165,11 +166,11 @@ CREATE TABLE dbo.Orders (
     Id INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
     UserId NVARCHAR(450) NOT NULL FOREIGN KEY REFERENCES dbo.AspNetUsers(Id),
     OrderDate DATETIME2 NOT NULL DEFAULT GETDATE(),
-    Status NVARCHAR(50) NOT NULL, -- Chờ xác nhận, Đang giao, Hoàn thành, Đã hủy
+    Status NVARCHAR(50) NOT NULL,
     TotalAmount DECIMAL(18,2) NOT NULL,
     DiscountAmount DECIMAL(18,2) NOT NULL DEFAULT 0,
     ShippingAddress NVARCHAR(500) NOT NULL,
-    PaymentMethod NVARCHAR(100) NOT NULL, -- COD, VNPay
+    PaymentMethod NVARCHAR(100) NOT NULL,
     VoucherCode NVARCHAR(50) NULL
 );
 
@@ -200,186 +201,111 @@ CREATE TABLE dbo.ChatLogs (
 );
 
 -- --------------------------------------------------
--- 4. SEED SECTIONS
+-- 4. SEED DATA
 -- --------------------------------------------------
 
--- 4.1. Roles & Users (Password is 'Admin@123', standard PBKDF2 hash)
-INSERT INTO dbo.AspNetRoles (Id, Name, NormalizedName, ConcurrencyStamp) VALUES
-('r1', 'Admin', 'ADMIN', 'stamp-admin'),
-('r2', 'User', 'USER', 'stamp-user');
+-- 4.1 Roles
+INSERT INTO dbo.AspNetRoles (Id, Name, NormalizedName, ConcurrencyStamp) VALUES ('r1', N'Admin', N'ADMIN', 'stamp-admin');
+INSERT INTO dbo.AspNetRoles (Id, Name, NormalizedName, ConcurrencyStamp) VALUES ('r2', N'User', N'USER', 'stamp-user');
 
-INSERT INTO dbo.AspNetUsers (Id, UserName, NormalizedUserName, Email, NormalizedEmail, EmailConfirmed, PasswordHash, SecurityStamp, ConcurrencyStamp, PhoneNumberConfirmed, TwoFactorEnabled, LockoutEnabled, AccessFailedCount, FullName, Address, CreatedDate) VALUES
-('u1', 'admin@clothingshop.com', 'ADMIN@CLOTHINGSHOP.COM', 'admin@clothingshop.com', 'ADMIN@CLOTHINGSHOP.COM', 1, 'AQAAAAIAAYagAAAAEO9v969+4kFh8Y3r2XW8d5O3aD1h6mD2q3w5e6r7t8y9==', 'sec-stamp-admin', 'con-stamp-admin', 0, 0, 1, 0, 'System Administrator', '123 Main St, Hanoi', GETDATE()),
-('u2', 'user@clothingshop.com', 'USER@CLOTHINGSHOP.COM', 'user@clothingshop.com', 'USER@CLOTHINGSHOP.COM', 1, 'AQAAAAIAAYagAAAAEO9v969+4kFh8Y3r2XW8d5O3aD1h6mD2q3w5e6r7t8y9==', 'sec-stamp-user', 'con-stamp-user', 0, 0, 1, 0, 'Nguyễn Văn Khách', '456 Le Loi, Ho Chi Minh City', GETDATE());
+-- 4.2 Users
+INSERT INTO dbo.AspNetUsers (Id, UserName, NormalizedUserName, Email, NormalizedEmail, EmailConfirmed, PasswordHash, SecurityStamp, ConcurrencyStamp, PhoneNumber, PhoneNumberConfirmed, TwoFactorEnabled, LockoutEnabled, AccessFailedCount, FullName, Address, CreatedDate) VALUES (
+  'u1', 'admin@clothingshop.com', 'ADMIN@CLOTHINGSHOP.COM', 'admin@clothingshop.com', 'ADMIN@CLOTHINGSHOP.COM',
+  1, 'AQAAAAIAAYagAAAAENCi+SU2qqv8rMq5S1oiTA/nJXFm0BAimE9j//ImkoKqvoVT9xSbkgApE5s1p+SBww==', 'H2QCLXITQL7XVADGBCEYO5CJIF5OHK3V', '63167bc6-5640-4e40-9720-c0103f5bf188',
+  NULL, 0, 0, 1, 0,
+  N'System Administrator', N'123 Main St, Hanoi', '2026-06-23 21:09:54');
+INSERT INTO dbo.AspNetUsers (Id, UserName, NormalizedUserName, Email, NormalizedEmail, EmailConfirmed, PasswordHash, SecurityStamp, ConcurrencyStamp, PhoneNumber, PhoneNumberConfirmed, TwoFactorEnabled, LockoutEnabled, AccessFailedCount, FullName, Address, CreatedDate) VALUES (
+  'u2', 'user@clothingshop.com', 'USER@CLOTHINGSHOP.COM', 'user@clothingshop.com', 'USER@CLOTHINGSHOP.COM',
+  1, 'AQAAAAIAAYagAAAAEP8x8F/OzTS6UmRIuriXy5R8k1F3WyYcHarNHKCzdWkHmwgdFsA3x6Tl2el79IplRQ==', '3Q6TMI7NMYHEVTRN2BVTEXQE7UVCTOZ7', '58fa39dc-8b1d-4366-b4ed-7356eb267e57',
+  NULL, 0, 0, 1, 0,
+  N'Nguy?n Van Khách', N'456 Le Loi, Ho Chi Minh City', '2026-06-23 21:09:54');
 
-INSERT INTO dbo.AspNetUserRoles (UserId, RoleId) VALUES
-('u1', 'r1'), -- Admin has Admin role
-('u1', 'r2'), -- Admin has User role too
-('u2', 'r2'); -- User has User role
+-- 4.3 UserRoles
+INSERT INTO dbo.AspNetUserRoles (UserId, RoleId) VALUES ('u1', 'r1');
+INSERT INTO dbo.AspNetUserRoles (UserId, RoleId) VALUES ('u1', 'r2');
+INSERT INTO dbo.AspNetUserRoles (UserId, RoleId) VALUES ('u2', 'r2');
 
--- 4.2. Categories
-INSERT INTO dbo.Categories (Name, ParentId) VALUES
-(N'Áo Nam', NULL),       -- Id 1
-(N'Quần Nam', NULL),     -- Id 2
-(N'Áo Nữ', NULL),        -- Id 3
-(N'Váy Nữ', NULL),       -- Id 4
-(N'Phụ Kiện', NULL);     -- Id 5
+-- 4.4 Categories
+SET IDENTITY_INSERT dbo.Categories ON;
+INSERT INTO dbo.Categories (Id, Name, ParentId) VALUES (1, N'Áo Nam', NULL);
+INSERT INTO dbo.Categories (Id, Name, ParentId) VALUES (2, N'Quần Nam', NULL);
+INSERT INTO dbo.Categories (Id, Name, ParentId) VALUES (3, N'Áo Nữ', NULL);
+INSERT INTO dbo.Categories (Id, Name, ParentId) VALUES (4, N'Váy Nữ', NULL);
+INSERT INTO dbo.Categories (Id, Name, ParentId) VALUES (5, N'Phụ Kiện', NULL);
+SET IDENTITY_INSERT dbo.Categories OFF;
 
--- 4.3. Brands
-INSERT INTO dbo.Brands (Name) VALUES
-('Nike'),    -- Id 1
-('Adidas'),  -- Id 2
-('Uniqlo'),  -- Id 3
-('Zara'),    -- Id 4
-('H&M');     -- Id 5
+-- 4.5 Brands
+SET IDENTITY_INSERT dbo.Brands ON;
+INSERT INTO dbo.Brands (Id, Name) VALUES (1, N'Nike');
+INSERT INTO dbo.Brands (Id, Name) VALUES (2, N'Adidas');
+INSERT INTO dbo.Brands (Id, Name) VALUES (3, N'Uniqlo');
+INSERT INTO dbo.Brands (Id, Name) VALUES (4, N'Zara');
+INSERT INTO dbo.Brands (Id, Name) VALUES (5, N'H&M');
+SET IDENTITY_INSERT dbo.Brands OFF;
 
--- 4.4. Products (20 products)
--- We use placeholder image urls like /images/products/productX.jpg which we can generate or build
-INSERT INTO dbo.Products (Name, Description, Price, DiscountPrice, BrandId, CategoryId, CreatedDate, IsActive) VALUES
--- Áo Nam (Cat 1)
-(N'Áo Sơ Mi Nam Công Sở Zara', N'Áo sơ mi nam Zara chất liệu cotton cao cấp, thoáng mát, form dáng ôm vừa vặn, thích hợp đi làm và hội họp.', 450000.00, 390000.00, 4, 1, GETDATE(), 1), -- Id 1
-(N'Áo Thun Nam Trơn Basic Uniqlo', N'Áo thun nam Uniqlo 100% cotton mềm mại, co giãn tốt, công nghệ Dry-Ex thấm hút mồ hôi hiệu quả.', 250000.00, NULL, 3, 1, GETDATE(), 1), -- Id 2
-(N'Áo Hoodie Nam Thể Thao H&M', N'Áo hoodie phong cách thể thao, năng động từ H&M, chất nỉ ấm áp cho những ngày lạnh.', 550000.00, 490000.00, 5, 1, GETDATE(), 1), -- Id 3
-(N'Áo Khoác Denim Nam Zara', N'Áo khoác denim chất lừ từ Zara, thiết kế cổ điển pha nét hiện đại, vải jean dày dặn.', 850000.00, 790000.00, 4, 1, GETDATE(), 1), -- Id 4
+-- 4.6 Products
+SET IDENTITY_INSERT dbo.Products ON;
+INSERT INTO dbo.Products (Id, Name, Description, Price, DiscountPrice, BrandId, CategoryId, CreatedDate, IsActive) VALUES (
+  1, N'Áo Sơ Mi Nam Công Sở Zara', N'Áo sơ mi nam Zara chất liệu cotton cao cấp, thoáng mát, form dáng ôm vừa vặn, thích hợp đi làm và hội họp.', 450000.00, 390000.00,
+  1, 1, '2026-06-23 21:09:54', 1);
+INSERT INTO dbo.Products (Id, Name, Description, Price, DiscountPrice, BrandId, CategoryId, CreatedDate, IsActive) VALUES (
+  2, N'Áo Thun Nam Trơn Basic Uniqlo', N'Áo thun nam Uniqlo 100% cotton mềm mại, co giãn tốt, công nghệ Dry-Ex thấm hút mồ hôi hiệu quả.', 250000.00, NULL,
+  1, 1, '2026-06-23 21:09:54', 1);
+SET IDENTITY_INSERT dbo.Products OFF;
 
--- Quần Nam (Cat 2)
-(N'Quần Tây Nam Lịch Lãm Uniqlo', N'Quần tây nam thiết kế tinh tế, chất vải chống nhăn tuyệt đối, chuẩn form công sở.', 600000.00, NULL, 3, 2, GETDATE(), 1), -- Id 5
-(N'Quần Jean Nam Skinny Zara', N'Quần jean skinny Zara co giãn nhẹ, ôm dáng trẻ trung năng động, dễ phối đồ.', 750000.00, 690000.00, 4, 2, GETDATE(), 1), -- Id 6
-(N'Quần Short Thể Thao Nike Pro', N'Quần short thể thao Nike Pro chuyên dụng chạy bộ và tập gym, chất liệu siêu nhẹ thoáng khí.', 400000.00, NULL, 1, 2, GETDATE(), 1), -- Id 7
-(N'Quần Jogger Nỉ Thể Thao Adidas', N'Quần jogger nỉ Adidas 3 sọc huyền thoại, thoải mái vận động cả ngày dài.', 900000.00, 850000.00, 2, 2, GETDATE(), 1), -- Id 8
+-- 4.7 ProductImages
+SET IDENTITY_INSERT dbo.ProductImages ON;
+INSERT INTO dbo.ProductImages (Id, ProductId, ImageUrl, IsMain) VALUES (1, 1, 'https://down-vn.img.susercontent.com/file/sg-11134202-7rd5v-lwkt0i7j3fkc70', 1);
+INSERT INTO dbo.ProductImages (Id, ProductId, ImageUrl, IsMain) VALUES (2, 1, '/images/products/p1-sub.jpg', 0);
+INSERT INTO dbo.ProductImages (Id, ProductId, ImageUrl, IsMain) VALUES (3, 2, 'https://www.uniqlo.com/vn/vi/news/topics/2024103101/img/62T_241031FvwWcC.png', 1);
+SET IDENTITY_INSERT dbo.ProductImages OFF;
 
--- Áo Nữ (Cat 3)
-(N'Áo Thun Nữ Cotton Uniqlo', N'Áo thun nữ Uniqlo cổ tròn cơ bản, nhiều màu sắc dễ thương, chất liệu cotton mịn màng.', 199000.00, NULL, 3, 3, GETDATE(), 1), -- Id 9
-(N'Áo Sơ Mi Nữ Tay Phồng H&M', N'Áo sơ mi nữ H&M phong cách tiểu thư cổ điển, tay phồng nhẹ nhàng thanh lịch.', 350000.00, 290000.00, 5, 3, GETDATE(), 1), -- Id 10
-(N'Áo Croptop Nữ Cá Tính Zara', N'Áo croptop ôm sát Zara tôn dáng, chất thun gân mát mẻ thích hợp mùa hè.', 220000.00, NULL, 4, 3, GETDATE(), 1), -- Id 11
-(N'Áo Vest Blazer Nữ Thanh Lịch H&M', N'Áo vest blazer dáng rộng thời trang H&M, thích hợp khoác ngoài đi làm hoặc đi chơi.', 750000.00, 650000.00, 5, 3, GETDATE(), 1), -- Id 12
+-- 4.8 ProductVariants
+SET IDENTITY_INSERT dbo.ProductVariants ON;
+INSERT INTO dbo.ProductVariants (Id, ProductId, Size, Color, Quantity, SKU) VALUES (1, 1, N'M', N'White', 50, 'ZARA-SHIRT-M-WHT');
+INSERT INTO dbo.ProductVariants (Id, ProductId, Size, Color, Quantity, SKU) VALUES (2, 1, N'L', N'White', 30, 'ZARA-SHIRT-L-WHT');
+INSERT INTO dbo.ProductVariants (Id, ProductId, Size, Color, Quantity, SKU) VALUES (3, 1, N'M', N'Blue', 20, 'ZARA-SHIRT-M-BLU');
+INSERT INTO dbo.ProductVariants (Id, ProductId, Size, Color, Quantity, SKU) VALUES (4, 2, N'S', N'Black', 100, 'UNI-TSHIRT-S-BLK');
+INSERT INTO dbo.ProductVariants (Id, ProductId, Size, Color, Quantity, SKU) VALUES (5, 2, N'M', N'Black', 150, 'UNI-TSHIRT-M-BLK');
+INSERT INTO dbo.ProductVariants (Id, ProductId, Size, Color, Quantity, SKU) VALUES (6, 2, N'L', N'White', 120, 'UNI-TSHIRT-L-WHT');
+SET IDENTITY_INSERT dbo.ProductVariants OFF;
 
--- Váy Nữ (Cat 4)
-(N'Váy Hoa Nhí Đi Biển Zara', N'Váy hai dây hoa nhí Zara thướt tha, chất voan mát rượi thích hợp những chuyến du lịch.', 650000.00, 550000.00, 4, 4, GETDATE(), 1), -- Id 13
-(N'Chân Váy Chữ A Công Sở Uniqlo', N'Chân váy chữ A Uniqlo dễ phối đồ, chất vải tuyết mưa dày dặn đứng dáng.', 399000.00, NULL, 3, 4, GETDATE(), 1), -- Id 14
-(N'Đầm Dạ Hội Sang Trọng H&M', N'Đầm ôm body trễ vai quý phái thích hợp cho các buổi tiệc tối lung linh từ H&M.', 1200000.00, 990000.00, 5, 4, GETDATE(), 1), -- Id 15
-(N'Đầm Suông Linen Mùa Hè Uniqlo', N'Đầm suông chất liệu linen tự nhiên từ Uniqlo, nhẹ nhàng thoáng mát tốt cho da.', 500000.00, 450000.00, 3, 4, GETDATE(), 1), -- Id 16
+-- 4.9 Vouchers
+SET IDENTITY_INSERT dbo.Vouchers ON;
+INSERT INTO dbo.Vouchers (Id, Code, DiscountPercent, DiscountAmount, ExpiryDate, UsageLimit, UsedCount) VALUES (1, 'HE2026', 15, NULL, '2026-08-31 23:59:59', 100, 0);
+INSERT INTO dbo.Vouchers (Id, Code, DiscountPercent, DiscountAmount, ExpiryDate, UsageLimit, UsedCount) VALUES (2, 'SALE50K', NULL, 50000.00, '2026-12-31 23:59:59', 500, 0);
+INSERT INTO dbo.Vouchers (Id, Code, DiscountPercent, DiscountAmount, ExpiryDate, UsageLimit, UsedCount) VALUES (3, 'WELCOME', 10, NULL, '2026-12-31 23:59:59', 1000, 0);
+SET IDENTITY_INSERT dbo.Vouchers OFF;
 
--- Phụ Kiện (Cat 5)
-(N'Nón Kết Thể Thao Nike Classic', N'Nón lưỡi trai Nike chất liệu dù chống thấm nước, logo thêu nổi bật phong cách.', 300000.00, NULL, 1, 5, GETDATE(), 1), -- Id 17
-(N'Tất Cổ Cao Thể Thao Adidas Trio', N'Set 3 đôi tất cổ cao Adidas cotton êm ái, thấm hút mồ hôi và nâng đỡ bàn chân.', 180000.00, 150000.00, 2, 5, GETDATE(), 1), -- Id 18
-(N'Thắt Lưng Da Nam Zara Classic', N'Thắt lưng da bò thật Zara, mặt khóa kim loại chống gỉ sang trọng.', 490000.00, NULL, 4, 5, GETDATE(), 1), -- Id 19
-(N'Kính Mát Thời Trang H&M Retro', N'Kính râm gọng nhựa H&M chống tia UV tuyệt đối, phụ kiện không thể thiếu khi ra đường.', 290000.00, 250000.00, 5, 5, GETDATE(), 1); -- Id 20
+-- 4.10 Carts
+SET IDENTITY_INSERT dbo.Carts ON;
+INSERT INTO dbo.Carts (Id, UserId, CreatedDate) VALUES (1, 'u2', '2026-06-23 21:09:55');
+INSERT INTO dbo.Carts (Id, UserId, CreatedDate) VALUES (2, 'u1', '2026-06-23 14:11:39');
+SET IDENTITY_INSERT dbo.Carts OFF;
 
--- 4.5. Product Images (Main & Sub images for products)
--- We will seed main images (IsMain = 1) for all 20 products
-INSERT INTO dbo.ProductImages (ProductId, ImageUrl, IsMain) VALUES
-(1, '/images/products/p1-main.jpg', 1), (1, '/images/products/p1-sub.jpg', 0),
-(2, '/images/products/p2-main.jpg', 1),
-(3, '/images/products/p3-main.jpg', 1),
-(4, '/images/products/p4-main.jpg', 1),
-(5, '/images/products/p5-main.jpg', 1),
-(6, '/images/products/p6-main.jpg', 1),
-(7, '/images/products/p7-main.jpg', 1),
-(8, '/images/products/p8-main.jpg', 1),
-(9, '/images/products/p9-main.jpg', 1),
-(10, '/images/products/p10-main.jpg', 1),
-(11, '/images/products/p11-main.jpg', 1),
-(12, '/images/products/p12-main.jpg', 1),
-(13, '/images/products/p13-main.jpg', 1),
-(14, '/images/products/p14-main.jpg', 1),
-(15, '/images/products/p15-main.jpg', 1),
-(16, '/images/products/p16-main.jpg', 1),
-(17, '/images/products/p17-main.jpg', 1),
-(18, '/images/products/p18-main.jpg', 1),
-(19, '/images/products/p19-main.jpg', 1),
-(20, '/images/products/p20-main.jpg', 1);
+-- 4.11 CartItems
+SET IDENTITY_INSERT dbo.CartItems ON;
+INSERT INTO dbo.CartItems (Id, CartId, ProductVariantId, Quantity) VALUES (1, 1, 1, 2);
+SET IDENTITY_INSERT dbo.CartItems OFF;
 
--- 4.6. Product Variants (Sizes and Colors with quantities)
--- Standard sizes: S, M, L, XL
--- Standard colors: Black, White, Red, Blue, Grey
-INSERT INTO dbo.ProductVariants (ProductId, Size, Color, Quantity, SKU) VALUES
--- Product 1: Áo Sơ Mi Zara (Price 450k)
-(1, 'M', 'White', 50, 'ZARA-SHIRT-M-WHT'),
-(1, 'L', 'White', 30, 'ZARA-SHIRT-L-WHT'),
-(1, 'M', 'Blue', 20, 'ZARA-SHIRT-M-BLU'),
--- Product 2: Áo Thun Uniqlo (Price 250k)
-(2, 'S', 'Black', 100, 'UNI-TSHIRT-S-BLK'),
-(2, 'M', 'Black', 150, 'UNI-TSHIRT-M-BLK'),
-(2, 'L', 'White', 120, 'UNI-TSHIRT-L-WHT'),
--- Product 3: Áo Hoodie H&M
-(3, 'M', 'Grey', 40, 'HM-HD-M-GRY'),
-(3, 'L', 'Grey', 35, 'HM-HD-L-GRY'),
--- Product 4: Áo Khoác Denim Zara
-(4, 'M', 'Blue', 15, 'ZARA-DENIM-M-BLU'),
-(4, 'L', 'Blue', 10, 'ZARA-DENIM-L-BLU'),
--- Product 5: Quần Tây Uniqlo
-(5, '30', 'Black', 30, 'UNI-PANTS-30-BLK'),
-(5, '31', 'Black', 40, 'UNI-PANTS-31-BLK'),
--- Product 6: Quần Jean Zara
-(6, '30', 'Blue', 25, 'ZARA-JEAN-30-BLU'),
-(6, '32', 'Blue', 20, 'ZARA-JEAN-32-BLU'),
--- Product 7: Quần Short Nike
-(7, 'M', 'Black', 80, 'NIKE-SHORT-M-BLK'),
-(7, 'L', 'Black', 60, 'NIKE-SHORT-L-BLK'),
--- Product 8: Quần Jogger Adidas
-(8, 'M', 'Black', 50, 'ADI-JOG-M-BLK'),
-(8, 'L', 'Grey', 40, 'ADI-JOG-L-GRY'),
--- Product 9: Áo Thun Nữ Uniqlo
-(9, 'S', 'White', 60, 'UNI-WTSHIRT-S-WHT'),
-(9, 'M', 'Red', 45, 'UNI-WTSHIRT-M-RED'),
--- Product 10: Áo Sơ Mi Nữ H&M
-(10, 'M', 'White', 30, 'HM-WSHIRT-M-WHT'),
-(10, 'S', 'Blue', 25, 'HM-WSHIRT-S-BLU'),
--- Product 11: Áo Croptop Zara
-(11, 'S', 'Black', 70, 'ZARA-CROP-S-BLK'),
-(11, 'M', 'White', 80, 'ZARA-CROP-M-WHT'),
--- Product 12: Blazer H&M
-(12, 'M', 'Grey', 20, 'HM-BLZ-M-GRY'),
--- Product 13: Váy Hoa Nhí Zara
-(13, 'S', 'Red', 15, 'ZARA-DRS-S-RED'),
-(13, 'M', 'Red', 20, 'ZARA-DRS-M-RED'),
--- Product 14: Chân Váy Uniqlo
-(14, 'M', 'Black', 35, 'UNI-SKT-M-BLK'),
--- Product 15: Đầm Dạ Hội H&M
-(15, 'S', 'Black', 10, 'HM-EVE-S-BLK'),
-(15, 'M', 'Black', 8, 'HM-EVE-M-BLK'),
--- Product 16: Đầm Suông Linen Uniqlo
-(16, 'M', 'White', 22, 'UNI-LN-M-WHT'),
--- Product 17: Nón Nike
-(17, 'FreeSize', 'Black', 150, 'NIKE-CAP-FS-BLK'),
--- Product 18: Tất Adidas
-(18, 'FreeSize', 'White', 300, 'ADI-SOX-FS-WHT'),
--- Product 19: Thắt Lưng Zara
-(19, '95', 'Black', 40, 'ZARA-BELT-95-BLK'),
--- Product 20: Kính Mát H&M
-(20, 'FreeSize', 'Black', 60, 'HM-GLASS-FS-BLK');
+-- 4.12 Orders
+SET IDENTITY_INSERT dbo.Orders ON;
+INSERT INTO dbo.Orders (Id, UserId, OrderDate, Status, TotalAmount, DiscountAmount, ShippingAddress, PaymentMethod, VoucherCode) VALUES (
+  1, 'u2', '2026-06-23 21:09:55', N'Chờ xác nhận',
+  1130000.00, 50000.00, N'456 Le Loi, Quận 1, TP. HCM', 'COD', 'SALE50K');
+SET IDENTITY_INSERT dbo.Orders OFF;
 
--- 4.7. Vouchers
-INSERT INTO dbo.Vouchers (Code, DiscountPercent, DiscountAmount, ExpiryDate, UsageLimit, UsedCount) VALUES
-('HE2026', 15, NULL, '2026-08-31 23:59:59', 100, 0),
-('SALE50K', NULL, 50000.00, '2026-12-31 23:59:59', 500, 0),
-('WELCOME', 10, NULL, '2026-12-31 23:59:59', 1000, 0);
+-- 4.13 OrderDetails
+SET IDENTITY_INSERT dbo.OrderDetails ON;
+INSERT INTO dbo.OrderDetails (Id, OrderId, ProductVariantId, Quantity, UnitPrice) VALUES (1, 1, 1, 2, 390000.00);
+INSERT INTO dbo.OrderDetails (Id, OrderId, ProductVariantId, Quantity, UnitPrice) VALUES (2, 1, 4, 1, 250000.00);
+SET IDENTITY_INSERT dbo.OrderDetails OFF;
 
--- 4.8. Reviews (Some initial reviews for products)
-INSERT INTO dbo.Reviews (ProductId, UserId, Rating, Comment, CreatedDate, IsApproved) VALUES
-(1, 'u2', 5, N'Áo mặc rất đẹp, đúng form công sở, chất vải mát ít nhăn.', GETDATE(), 1),
-(2, 'u2', 4, N'Áo thun mặc ở nhà rất thoải mái, co giãn tốt.', GETDATE(), 1),
-(5, 'u2', 5, N'Quần tây vừa vặn, đứng dáng, rất hài lòng.', GETDATE(), 1);
+-- 4.14 Reviews (0 ban ghi)
+-- Khong co du lieu Reviews.
 
--- 4.9. Carts & Cart Items for seed User (u2)
--- Create a cart for Nguyen Van Khach (u2)
-INSERT INTO dbo.Carts (UserId, CreatedDate) VALUES ('u2', GETDATE());
--- Let's put a variant inside the cart (ZARA-SHIRT-M-WHT variant id = 1)
-INSERT INTO dbo.CartItems (CartId, ProductVariantId, Quantity) VALUES (1, 1, 2);
-
--- 4.10. Orders & Order Details for seed User (u2)
-INSERT INTO dbo.Orders (UserId, OrderDate, Status, TotalAmount, DiscountAmount, ShippingAddress, PaymentMethod, VoucherCode) VALUES
-('u2', GETDATE(), N'Chờ xác nhận', 1130000.00, 50000.00, N'456 Le Loi, Quận 1, TP. HCM', 'COD', 'SALE50K');
-
--- Detail:
--- ProductVariant 1 (Zara Shirt M White - UnitPrice 390k) - quantity 2 -> 780k
--- ProductVariant 4 (Uniqlo T-shirt S Black - UnitPrice 250k) - quantity 1 -> 250k
--- Subtotal: 1030k + Shipping (e.g. 150k) = 1180k - 50k discount = 1130k
-INSERT INTO dbo.OrderDetails (OrderId, ProductVariantId, Quantity, UnitPrice) VALUES
-(1, 1, 2, 390000.00),
-(1, 4, 1, 250000.00);
-
--- 4.11. ChatLogs
-INSERT INTO dbo.ChatLogs (UserId, Message, Response, CreatedDate) VALUES
-('u2', N'tìm áo sơ mi nam', N'Chào bạn! Dưới đây là gợi ý áo sơ mi nam phù hợp: Áo Sơ Mi Nam Công Sở Zara (390.000đ). Hãy click vào link sau để xem chi tiết.', GETDATE());
+-- 4.15 ChatLogs
+SET IDENTITY_INSERT dbo.ChatLogs ON;
+INSERT INTO dbo.ChatLogs (Id, UserId, Message, Response, CreatedDate) VALUES (1, 'u2', N'tìm áo sơ mi nam', N'Chào bạn! Dưới đây là gợi ý áo sơ mi nam phù hợp: Áo Sơ Mi Nam Công Sở Zara (390.000đ). Hãy click vào link sau để xem chi tiết.', '2026-06-23 21:09:55');
+INSERT INTO dbo.ChatLogs (Id, UserId, Message, Response, CreatedDate) VALUES (2, 'u1', N'a', N'Dưới đây là một số sản phẩm phù hợp với yêu cầu của bạn. Hãy click vào để xem chi tiết nhé! (Gợi ý 2 sản phẩm)', '2026-06-23 14:31:32');
+SET IDENTITY_INSERT dbo.ChatLogs OFF;
