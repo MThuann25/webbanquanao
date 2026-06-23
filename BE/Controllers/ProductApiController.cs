@@ -37,19 +37,22 @@ namespace ClothingShop.Web.Controllers
             [FromQuery] string? search, 
             [FromQuery] int? categoryId, 
             [FromQuery] int? brandId, 
+            [FromQuery] int? productTypeId,
             [FromQuery] string? size, 
             [FromQuery] string? color,
             [FromQuery] decimal? minPrice, 
             [FromQuery] decimal? maxPrice, 
+            [FromQuery] bool? isDiscount,
             [FromQuery] string sortBy = "newest", 
             [FromQuery] int page = 1)
         {
             int pageSize = 9;
             var result = await _productService.GetFilteredProductsAsync(
-                search, categoryId, brandId, size, color, minPrice, maxPrice, sortBy, page, pageSize);
+                search, categoryId, brandId, productTypeId, size, color, minPrice, maxPrice, sortBy, page, pageSize, isDiscount);
 
             var categories = await _categoryService.GetAllCategoriesAsync();
             var brands = await _brandService.GetAllBrandsAsync();
+            var productTypes = await _unitOfWork.Repository<ProductType>().GetQueryable().ToListAsync();
 
             var allVariants = _unitOfWork.Repository<ProductVariant>().GetQueryable().ToList();
             var allSizes = allVariants.Select(v => v.Size).Distinct().OrderBy(s => s).ToList();
@@ -65,12 +68,15 @@ namespace ClothingShop.Web.Controllers
                 isActive = p.IsActive,
                 categoryId = p.CategoryId,
                 brandId = p.BrandId,
+                productTypeId = p.ProductTypeId,
                 imageUrl = p.ProductImages.FirstOrDefault(pi => pi.IsMain)?.ImageUrl ?? "https://images.unsplash.com/photo-1523381210434-271e8be1f52b?w=400",
                 images = p.ProductImages.Select(pi => pi.ImageUrl).ToList(),
                 categoryName = p.Category?.Name,
                 brandName = p.Brand?.Name,
+                productTypeName = p.ProductType?.Name,
                 rating = p.Reviews.Any(r => r.IsApproved) ? Math.Round(p.Reviews.Where(r => r.IsApproved).Average(r => r.Rating), 1) : (double?)null,
-                ratingCount = p.Reviews.Count(r => r.IsApproved)
+                ratingCount = p.Reviews.Count(r => r.IsApproved),
+                defaultVariantId = p.ProductVariants.FirstOrDefault()?.Id
             });
 
             return Ok(new
@@ -81,6 +87,7 @@ namespace ClothingShop.Web.Controllers
                 totalPages = (int)Math.Ceiling((double)result.TotalCount / pageSize),
                 categories = categories.Select(c => new { id = c.Id, name = c.Name, parentId = c.ParentId }),
                 brands = brands.Select(b => new { id = b.Id, name = b.Name }),
+                productTypes = productTypes.Select(pt => new { id = pt.Id, name = pt.Name }),
                 allSizes,
                 allColors
             });
@@ -137,6 +144,7 @@ namespace ClothingShop.Web.Controllers
                 isActive = product.IsActive,
                 categoryName = product.Category?.Name,
                 brandName = product.Brand?.Name,
+                productTypeName = product.ProductType?.Name,
                 images = product.ProductImages.Select(pi => new { id = pi.Id, imageUrl = pi.ImageUrl, isMain = pi.IsMain }).ToList(),
                 variants = product.ProductVariants.Select(pv => new { id = pv.Id, size = pv.Size, color = pv.Color, sku = pv.SKU, stock = pv.Quantity }).ToList(),
                 reviews,

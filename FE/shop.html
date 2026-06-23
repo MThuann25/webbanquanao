@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
@@ -84,6 +84,16 @@
                     </div>
                 </div>
 
+                <!-- Product Types -->
+                <div class="bg-white rounded-2xl border border-gray-150 p-6 shadow-sm">
+                    <h3 class="font-bold text-xs uppercase text-gray-400 tracking-wider mb-4">Loại sản phẩm</h3>
+                    <div id="filter-product-types" class="space-y-2 text-xs">
+                        <div class="flex items-center space-x-2">
+                            <i class="fa-solid fa-spinner animate-spin text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Sizes & Colors -->
                 <div class="bg-white rounded-2xl border border-gray-150 p-6 shadow-sm">
                     <h3 class="font-bold text-xs uppercase text-gray-400 tracking-wider mb-4">Kích thước</h3>
@@ -134,17 +144,41 @@
         let currentPage = 1;
         let selectedCategory = null;
         let selectedBrand = null;
+        let selectedProductType = null;
         let selectedSize = null;
         let selectedColor = null;
+        let filterDiscount = null;
 
         document.addEventListener("DOMContentLoaded", async () => {
-            // Read query params
+            const data = await loadFilters();
+            
             const params = new URLSearchParams(window.location.search);
             if (params.has("categoryId")) selectedCategory = parseInt(params.get("categoryId"));
             if (params.has("brandId")) selectedBrand = parseInt(params.get("brandId"));
+            if (params.has("productTypeId")) selectedProductType = parseInt(params.get("productTypeId"));
+            if (params.has("isDiscount")) filterDiscount = params.get("isDiscount") === "true";
+            
+            if (params.has("categoryName") && data && data.categories) {
+                const cat = data.categories.find(c => c.name.toLowerCase() === params.get("categoryName").toLowerCase());
+                if (cat) selectedCategory = cat.id;
+            }
+            if (params.has("productTypeName") && data && data.productTypes) {
+                const pt = data.productTypes.find(p => p.name.toLowerCase() === params.get("productTypeName").toLowerCase());
+                if (pt) selectedProductType = pt.id;
+            }
+
             if (params.has("search")) document.getElementById("search-input").value = params.get("search");
 
-            await loadFilters();
+            // Update radio buttons if selected by name
+            if (selectedCategory) {
+                const catRadio = document.querySelector(`input[name="category"][value="${selectedCategory}"]`);
+                if (catRadio) catRadio.checked = true;
+            }
+            if (selectedProductType) {
+                const ptRadio = document.querySelector(`input[name="productType"][value="${selectedProductType}"]`);
+                if (ptRadio) ptRadio.checked = true;
+            }
+
             await fetchProducts();
         });
 
@@ -185,6 +219,23 @@
                         `;
                     });
 
+                    // Render Product Types
+                    const ptContainer = document.getElementById("filter-product-types");
+                    if (ptContainer && data.productTypes) {
+                        ptContainer.innerHTML = `<label class="flex items-center space-x-2.5 py-1 text-gray-600 hover:text-indigo-600 cursor-pointer">
+                            <input type="radio" name="productType" value="all" ${!selectedProductType ? 'checked' : ''} onchange="setProductType(null)" class="text-indigo-600 focus:ring-indigo-500">
+                            <span>Tất cả loại SP</span>
+                        </label>`;
+                        data.productTypes.forEach(pt => {
+                            ptContainer.innerHTML += `
+                                <label class="flex items-center space-x-2.5 py-1 text-gray-600 hover:text-indigo-600 cursor-pointer">
+                                    <input type="radio" name="productType" value="${pt.id}" ${selectedProductType === pt.id ? 'checked' : ''} onchange="setProductType(${pt.id})" class="text-indigo-600 focus:ring-indigo-500">
+                                    <span>${pt.name}</span>
+                                </label>
+                            `;
+                        });
+                    }
+
                     // Render Sizes
                     const sizeContainer = document.getElementById("filter-sizes");
                     sizeContainer.innerHTML = "";
@@ -206,10 +257,13 @@
                             </button>
                         `;
                     });
+                    
+                    return data;
                 }
             } catch (e) {
                 console.error("Error loading filter listings:", e);
             }
+            return null;
         }
 
         function setCategory(id) {
@@ -220,6 +274,12 @@
 
         function setBrand(id) {
             selectedBrand = id;
+            currentPage = 1;
+            fetchProducts();
+        }
+
+        function setProductType(id) {
+            selectedProductType = id;
             currentPage = 1;
             fetchProducts();
         }
@@ -273,8 +333,10 @@
             
             if (selectedCategory) params.append("categoryId", selectedCategory);
             if (selectedBrand) params.append("brandId", selectedBrand);
+            if (selectedProductType) params.append("productTypeId", selectedProductType);
             if (selectedSize) params.append("size", selectedSize);
             if (selectedColor) params.append("color", selectedColor);
+            if (filterDiscount) params.append("isDiscount", "true");
             
             const minPrice = document.getElementById("price-min").value;
             const maxPrice = document.getElementById("price-max").value;
@@ -307,8 +369,19 @@
                             card.className = "group bg-white rounded-3xl border border-gray-100 overflow-hidden hover:shadow-xl hover:shadow-indigo-500/5 transition duration-300 flex flex-col";
                             card.innerHTML = `
                                 <div class="relative overflow-hidden aspect-[4/5] bg-gray-100">
-                                    <img src="${p.imageUrl}" alt="${p.name}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                                    <a href="detail.html?id=${p.id}" class="block w-full h-full">
+                                        <img src="${p.imageUrl}" alt="${p.name}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                                    </a>
                                     ${p.discountPrice ? `<span class="absolute top-4 left-4 bg-rose-500 text-white text-[9px] font-black tracking-widest px-2.5 py-1 rounded-full uppercase shadow">Giảm</span>` : ""}
+                                    <!-- Hover actions -->
+                                    <div class="absolute bottom-0 left-0 right-0 p-2 translate-y-full opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 flex justify-center space-x-1 pointer-events-none">
+                                        <button onclick="event.preventDefault(); ${p.defaultVariantId ? `typeof addToCart !== 'undefined' ? addToCart(${p.defaultVariantId}, 1).then(res => alert(res.message)) : alert('Vui lòng đăng nhập')` : `alert('Sản phẩm đã hết hàng')`}" class="pointer-events-auto flex-1 bg-white border border-gray-200 text-gray-900 text-[10px] font-bold uppercase py-2 flex items-center justify-center hover:bg-gray-50 transition shadow-sm rounded-sm">
+                                            <i class="fa-solid fa-bag-shopping mr-1.5 text-sm"></i> THÊM VÀO GIỎ
+                                        </button>
+                                        <a href="detail.html?id=${p.id}" class="pointer-events-auto bg-gray-800 text-white w-10 flex items-center justify-center hover:bg-gray-700 transition shadow-sm rounded-sm">
+                                            <i class="fa-regular fa-eye text-sm"></i>
+                                        </a>
+                                    </div>
                                 </div>
                                 <div class="p-5 flex-1 flex flex-col">
                                     <span class="text-xxs text-gray-400 uppercase tracking-widest font-semibold">${p.brandName || "Thương hiệu"}</span>
