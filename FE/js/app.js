@@ -209,9 +209,10 @@ function injectHeader() {
 
     const navLinksHtml = isAdmin ? "" : `
         <!-- Nav Links -->
-        <nav class="hidden md:flex space-x-8">
-            <a href="index.html" class="text-gray-600 hover:text-indigo-600 px-3 py-2 text-sm font-medium transition">Trang Chủ</a>
-            <a href="shop.html" class="text-gray-600 hover:text-indigo-600 px-3 py-2 text-sm font-medium transition">Cửa Hàng</a>
+        <nav class="hidden md:flex space-x-8 relative" id="main-nav-container">
+            <a href="index.html" class="nav-link-drop text-gray-600 px-3 py-2 text-sm font-medium transition">Trang Chủ</a>
+            <a href="shop.html" class="nav-link-drop text-gray-600 px-3 py-2 text-sm font-medium transition">Cửa Hàng</a>
+            <div id="nav-glass-droplet"></div>
         </nav>
     `;
 
@@ -308,6 +309,87 @@ function injectHeader() {
     #dmt-logo-link:hover .dmt-logo-light .dmt-bounce-item {
         color: #7c3aed;
     }
+    
+    /* Menu Links */
+    .nav-link-drop {
+        position: relative;
+        display: inline-block; /* Đảm bảo tính toán kích thước hộp chính xác */
+        padding: 0.5rem 1.2rem;
+        color: #4b5563;
+        font-weight: 500;
+        z-index: 10;
+        overflow: visible !important;
+        transition: color 0.3s ease, text-shadow 0.3s ease;
+    }
+    .nav-link-drop.active {
+        color: #4f46e5 !important;
+        text-shadow: 0px 1px 2px rgba(79, 70, 229, 0.25);
+    }
+    .nav-link-drop:hover {
+        color: #4f46e5 !important;
+    }
+
+    /* Giọt nước thủy tinh lỏng dùng chung */
+    #nav-glass-droplet {
+        position: absolute;
+        margin-left: 0 !important; /* Ngăn chặn Tailwind space-x-8 làm lệch vị trí của giọt nước */
+        background: rgba(79, 70, 229, 0.15); /* Màu nước xanh indigo */
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        border: 1px solid rgba(79, 70, 229, 0.35); /* Viền màu indigo rõ nét */
+        box-shadow: 
+            inset 0 4px 6px rgba(255, 255, 255, 0.6), 
+            inset 0 -4px 6px rgba(79, 70, 229, 0.25),
+            0 8px 20px rgba(79, 70, 229, 0.15),
+            0 2px 4px rgba(0, 0, 0, 0.02);
+        z-index: 1;
+        opacity: 0;
+        pointer-events: none;
+        transition: all 0.45s cubic-bezier(0.25, 1, 0.5, 1);
+        border-radius: 40% 60% 70% 30% / 45% 55% 35% 65%;
+        animation: glass-wobble 3s linear infinite alternate;
+    }
+
+    /* Tia sáng phản chiếu trên bóng nước dùng chung */
+    #nav-glass-droplet::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        background: linear-gradient(
+            135deg, 
+            rgba(255, 255, 255, 0) 0%, 
+            rgba(255, 255, 255, 0) 30%, 
+            rgba(255, 255, 255, 0.75) 50%, 
+            rgba(255, 255, 255, 0) 70%, 
+            rgba(255, 255, 255, 0) 100%
+        );
+        background-size: 250% 250%;
+        background-position: 200% 0%;
+        animation: glass-shine 1.6s ease-in-out infinite;
+        pointer-events: none;
+    }
+
+    @keyframes glass-wobble {
+        0% {
+            border-radius: 42% 58% 70% 30% / 45% 55% 35% 65%;
+        }
+        50% {
+            border-radius: 65% 35% 55% 45% / 40% 60% 40% 60%;
+        }
+        100% {
+            border-radius: 45% 55% 68% 32% / 50% 50% 45% 55%;
+        }
+    }
+
+    @keyframes glass-shine {
+        0% {
+            background-position: 180% 0%;
+        }
+        100% {
+            background-position: -80% 0%;
+        }
+    }
     </style>
     <header class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100 transition-all duration-300">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -357,6 +439,78 @@ function injectHeader() {
                 </div>
             </div>
         `;
+    }
+
+    // Khởi tạo hiệu ứng giọt nước trượt thông minh
+    function initSlidingDroplet() {
+        const nav = document.getElementById("main-nav-container");
+        if (!nav) return;
+        const droplet = document.getElementById("nav-glass-droplet");
+        if (!droplet) return;
+
+        const navLinks = nav.querySelectorAll(".nav-link-drop");
+        const path = window.location.pathname;
+        let activeLink = null;
+        
+        navLinks.forEach(link => {
+            const href = link.getAttribute("href");
+            if (path.endsWith(href) || (href === "index.html" && (path === "" || path === "/" || path.endsWith("/") || path.endsWith("/index.html")))) {
+                link.classList.add("active");
+                activeLink = link;
+            }
+        });
+
+        function moveDropletTo(link) {
+            if (!link) {
+                droplet.style.opacity = "0";
+                return;
+            }
+            const linkRect = link.getBoundingClientRect();
+            const navRect = nav.getBoundingClientRect();
+            
+            // Tính toán vị trí tương đối chính xác dựa trên tọa độ pixel hiển thị thực tế
+            const paddingX = 8; // Phần đệm ngang để giọt nước ôm chữ rộng hơn
+            const paddingY = 4; // Phần đệm dọc để giọt nước ôm chữ cao hơn
+            
+            const left = linkRect.left - navRect.left - paddingX;
+            const top = linkRect.top - navRect.top - paddingY;
+            const width = linkRect.width + (paddingX * 2);
+            const height = linkRect.height + (paddingY * 2);
+            
+            droplet.style.left = `${left}px`;
+            droplet.style.top = `${top}px`;
+            droplet.style.width = `${width}px`;
+            droplet.style.height = `${height}px`;
+            droplet.style.opacity = "1";
+        }
+
+        if (activeLink) {
+            // Đợi UI render ổn định rồi tính toán kích thước ban đầu
+            setTimeout(() => moveDropletTo(activeLink), 150);
+        }
+
+        navLinks.forEach(link => {
+            link.addEventListener("mouseenter", () => moveDropletTo(link));
+        });
+
+        nav.addEventListener("mouseleave", () => {
+            if (activeLink) {
+                moveDropletTo(activeLink);
+            } else {
+                droplet.style.opacity = "0";
+            }
+        });
+
+        window.addEventListener("resize", () => {
+            const currentActive = nav.querySelector(".nav-link-drop.active");
+            if (currentActive) {
+                moveDropletTo(currentActive);
+            }
+        });
+    }
+
+    if (!isAdmin) {
+        initSlidingDroplet();
     }
 }
 

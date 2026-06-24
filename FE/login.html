@@ -85,7 +85,7 @@
     <!-- JS scripts -->
     <script src="js/app.js"></script>
     <script>
-        let returnUrl = "profile.html";
+        let returnUrl = "index.html";
 
         function togglePasswordVisibility(inputId, btn) {
             const input = document.getElementById(inputId);
@@ -147,7 +147,7 @@
 
         function triggerGoogleLogin() {
             // Point OAuth redirect to Backend AuthApi controller challenge
-            window.location.href = `${API_BASE_URL}/api/AuthApi/externallogin?provider=Google&returnUrl=${window.location.origin}/profile.html`;
+            window.location.href = `${API_BASE_URL}/api/AuthApi/externallogin?provider=Google&returnUrl=${window.location.origin}/index.html`;
         }
 
         // --- Forgot Password Logic ---

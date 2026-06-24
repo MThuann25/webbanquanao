@@ -221,6 +221,7 @@ namespace ClothingShop.Web.Controllers
                 .Include(o => o.OrderDetails)
                     .ThenInclude(od => od.ProductVariant)
                         .ThenInclude(pv => pv.Product)
+                            .ThenInclude(p => p.ProductImages)
                 .FirstOrDefaultAsync(o => o.Id == id && o.UserId == userId);
 
             if (order == null) return NotFound(new { message = "Không tìm thấy đơn hàng." });
